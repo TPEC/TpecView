@@ -1,8 +1,10 @@
 package pers.tpec.tpecview;
 
+import android.util.SparseArray;
+
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Example local unit test, which will execute on the development machine (host).

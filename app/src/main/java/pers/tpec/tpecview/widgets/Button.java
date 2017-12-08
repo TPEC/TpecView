@@ -19,16 +19,14 @@ public class Button implements SceneObject {
     private boolean visible;
 
     private Bitmap bmpBg;
-    //    private Bitmap bmpSf;
+
     private Paint paint;
 
     private ControllerClassifier controllerClassifier;
-    private ControllerClassifier.OnClickListener onClickListener;
 
-
-    public Button(@NonNull Rect rectF) {
+    public Button(@NonNull Rect rectDst) {
         controllerClassifier = new ControllerClassifier();
-        setRectDst(rectF);
+        setRectDst(rectDst);
         enabled = true;
         visible = true;
         paint = new Paint();
@@ -60,13 +58,17 @@ public class Button implements SceneObject {
         return this;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
     public Button setVisible(final boolean visible) {
         this.visible = visible;
         return this;
     }
 
     public Button setOnClickListener(ControllerClassifier.OnClickListener onClickListener) {
-        this.onClickListener = onClickListener;
+        controllerClassifier.setOnClickListener(onClickListener);
         return this;
     }
 

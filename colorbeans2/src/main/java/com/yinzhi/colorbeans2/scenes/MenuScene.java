@@ -30,12 +30,6 @@ public class MenuScene extends Scene {
 
     @Override
     public void load() {
-        addSceneObject(new Button().setOnClickListener(new ControllerClassifier.OnClickListener() {
-            @Override
-            public boolean click(int x, int y) {
-                return false;
-            }
-        }), 1);
 
     }
 
