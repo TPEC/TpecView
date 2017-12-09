@@ -56,6 +56,7 @@ public class AStarPathFinding2d implements PathFinding2d<Integer> {
                 return Integer.compare(node1.value, node2.value);
             }
         };
+        map[start] = MAP_ACCESSIBLE;
         List<Integer> r = new ArrayList<>();
         Node n = new Node(end, 0, getDistance(start, end), null);
         mapEnabled[n.i] = false;

@@ -1,4 +1,4 @@
-package com.yinzhi.colorbeans2;
+package pers.tpec.games.colorbeans2;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

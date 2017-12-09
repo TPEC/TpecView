@@ -8,7 +8,7 @@ import android.util.SparseArray;
 import android.util.TypedValue;
 
 public class ResManager {
-    private final SparseArray<Bitmap> bmp;
+    private final SparseArray<BitmapBundle> bmp;
     private int lastIndex;
     private Resources resources;
 
@@ -19,29 +19,38 @@ public class ResManager {
     }
 
     public int loadBmp(final int bmpId) {
-        int i = getNewId();
-        synchronized (bmp) {
-            Bitmap bitmap = decodeResource(bmpId);
-            bmp.put(i, bitmap);
-        }
-        return i;
+        return loadBmp(resources, bmpId);
     }
 
     public int loadBmp(final Resources resources, final int bmpId) {
-        int i = getNewId();
-        synchronized (bmp) {
-            Bitmap bitmap = decodeResource(resources, bmpId);
-            bmp.put(i, bitmap);
+        Integer id = getBmpId(bmpId);
+        if (id == null) {
+            int i = getNewId();
+            synchronized (bmp) {
+                Bitmap bitmap = decodeResource(resources, bmpId);
+                bmp.put(i, new BitmapBundle(bmpId, bitmap));
+            }
+            return i;
+        } else {
+            return id;
         }
-        return i;
     }
 
     public Bitmap getBmp(final int id) {
-        Bitmap r;
         synchronized (bmp) {
-            r = bmp.get(id);
+            return bmp.get(id).bmp;
         }
-        return r;
+    }
+
+    private Integer getBmpId(final int bmpId) {
+        synchronized (bmp) {
+            for (int i = 0; i < bmp.size(); i++) {
+                if (bmpId == bmp.valueAt(i).id) {
+                    return i;
+                }
+            }
+        }
+        return null;
     }
 
     public void unloadBmp(final int id) {
@@ -53,7 +62,18 @@ public class ResManager {
     public void unloadBmp(@NonNull final Bitmap bitmap) {
         synchronized (bmp) {
             for (int i = 0; i < bmp.size(); i++) {
-                if (bitmap == bmp.valueAt(i)) {
+                if (bitmap == bmp.valueAt(i).bmp) {
+                    bmp.delete(bmp.keyAt(i));
+                    break;
+                }
+            }
+        }
+    }
+
+    public void unloadBmpId(final int bmpId) {
+        synchronized (bmp) {
+            for (int i = 0; i < bmp.size(); i++) {
+                if (bmpId == bmp.valueAt(i).id) {
                     bmp.delete(bmp.keyAt(i));
                     break;
                 }
@@ -99,5 +119,15 @@ public class ResManager {
 
     public static ResManager getInstance() {
         return ourInstance;
+    }
+
+    class BitmapBundle {
+        int id;
+        Bitmap bmp;
+
+        public BitmapBundle(int id, Bitmap bmp) {
+            this.id = id;
+            this.bmp = bmp;
+        }
     }
 }

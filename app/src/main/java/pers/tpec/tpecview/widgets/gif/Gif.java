@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.RectF;
 
 import pers.tpec.tpecview.SceneObject;
 
@@ -14,12 +13,17 @@ public abstract class Gif implements SceneObject {
     public static final int MODE_ONEWAY_ROUND = 2;
     public static final int MODE_RETURN = 3;
 
+    public static final int RES_MODE_HORIZON = 0;
+    public static final int RES_MODE_PORTRAIT = 1;
+
+
     private Bitmap bmpRes;
     private Rect rectSrc;
-    private RectF rectDst;
+    private Rect rectDst;
     private Paint paint;
 
     private int mode;
+    private int resMode;
     private int frameCount;
     private int frameIndex;
     private boolean reverse;
@@ -39,7 +43,7 @@ public abstract class Gif implements SceneObject {
         visible = true;
     }
 
-    public Gif setRectDst(final RectF rectDst) {
+    public Gif setRectDst(final Rect rectDst) {
         this.rectDst = rectDst;
         checkReady();
         return this;
@@ -54,14 +58,20 @@ public abstract class Gif implements SceneObject {
         return this;
     }
 
-    public Gif setRes(final Bitmap bmpRes, final int frameCount) {
+    public Gif setRes(final Bitmap bmpRes, final int resMode, final int frameCount) {
         this.bmpRes = bmpRes;
+        this.resMode = resMode;
         this.frameCount = frameCount;
         this.frameIndex = 0;
         rectSrc.left = 0;
         rectSrc.top = 0;
-        rectSrc.right = bmpRes.getWidth() / frameCount;
-        rectSrc.bottom = bmpRes.getHeight();
+        if (resMode == RES_MODE_HORIZON) {
+            rectSrc.right = bmpRes.getWidth() / frameCount;
+            rectSrc.bottom = bmpRes.getHeight();
+        } else if (resMode == RES_MODE_PORTRAIT) {
+            rectSrc.right = bmpRes.getWidth();
+            rectSrc.bottom = bmpRes.getHeight() / frameCount;
+        }
         checkReady();
         return this;
     }
@@ -101,6 +111,16 @@ public abstract class Gif implements SceneObject {
 
     public void pause() {
         play = false;
+    }
+
+    public Gif setFrame(final int frameIndex) {
+        this.frameIndex = frameIndex;
+        if (resMode == RES_MODE_HORIZON) {
+            rectSrc.offsetTo(frameIndex * rectSrc.width(), 0);
+        } else if (resMode == RES_MODE_PORTRAIT) {
+            rectSrc.offsetTo(0, frameIndex * rectSrc.height());
+        }
+        return this;
     }
 
     private void checkReady() {
@@ -171,7 +191,11 @@ public abstract class Gif implements SceneObject {
                     default:
                         break;
                 }
-                // TODO: 2017/12/1 rectSrc.offset
+                if (resMode == RES_MODE_HORIZON) {
+                    rectSrc.offsetTo(frameIndex * rectSrc.width(), 0);
+                } else if (resMode == RES_MODE_PORTRAIT) {
+                    rectSrc.offsetTo(0, frameIndex * rectSrc.height());
+                }
             }
         }
     }

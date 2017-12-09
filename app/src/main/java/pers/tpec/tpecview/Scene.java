@@ -1,24 +1,64 @@
 package pers.tpec.tpecview;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 
+import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Scene {
+import pers.tpec.tpecview.controller.Controller;
+
+public abstract class Scene implements Controller{
     protected final TpecView tpecView;
 
     private final SparseArray<SceneObject> sceneObjects;
     private int lastPriority;
 
+    private final List<Integer> bmpId;
+
     public Scene(@NonNull final TpecView tpecView) {
         this.tpecView = tpecView;
         sceneObjects = new SparseArray<>();
         lastPriority = Integer.MAX_VALUE;
+        bmpId = new ArrayList<>();
+    }
+
+    protected final int loadBmp(final int bmpId) {
+        int i = ResManager.getInstance().loadBmp(bmpId);
+        if (!this.bmpId.contains(i)) {
+            this.bmpId.add(i);
+        }
+        return i;
+    }
+
+    public final Bitmap getBmp(final int id) {
+        return ResManager.getInstance().getBmp(id);
+    }
+
+    protected final void unloadBmp(final int id) {
+        synchronized (bmpId) {
+            for (int i = 0; i < bmpId.size(); i++) {
+                if (bmpId.get(i) == id) {
+                    bmpId.remove(i);
+                    ResManager.getInstance().unloadBmp(id);
+                    break;
+                }
+            }
+        }
+    }
+
+    protected final void unloadBmpAll() {
+        synchronized (bmpId) {
+            for (Integer i : bmpId) {
+                ResManager.getInstance().unloadBmp(i);
+            }
+            bmpId.clear();
+        }
     }
 
     public abstract void load();
@@ -52,6 +92,7 @@ public abstract class Scene {
         }
     }
 
+    @Override
     public boolean onTouch(MotionEvent event) {
         synchronized (sceneObjects) {
             for (int i = 0; i < sceneObjects.size(); i++) {
@@ -67,6 +108,10 @@ public abstract class Scene {
         tpecView.switchScene(scene);
     }
 
+    protected final void switchScene(@NonNull Class<? extends Scene> sceneClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        switchScene(sceneClass.getDeclaredConstructor(TpecView.class).newInstance(tpecView));
+    }
+
     protected final int addSceneObject(@NonNull SceneObject sceneObject) {
         return addSceneObject(sceneObject, getNewPriority());
     }
@@ -79,7 +124,7 @@ public abstract class Scene {
             } else {
                 lastPriority++;
             }
-            f = sceneObjects.get(lastPriority,null) != null;
+            f = sceneObjects.get(lastPriority, null) != null;
         } while (f);
         return lastPriority;
     }

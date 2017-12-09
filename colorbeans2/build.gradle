@@ -6,8 +6,8 @@ android {
 
 
     defaultConfig {
-        applicationId "com.yinzhi.colorbeans2"
-        minSdkVersion 17
+        applicationId "pers.tpec.game.colorbeans2"
+        minSdkVersion 19
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"

@@ -1,12 +1,12 @@
-package com.yinzhi.colorbeans2;
+package pers.tpec.games.colorbeans2;
 
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 
-import com.yinzhi.colorbeans2.scenes.MenuScene;
 
+import pers.tpec.games.colorbeans2.scenes.MenuScene;
 import pers.tpec.tpecview.ResManager;
 import pers.tpec.tpecview.TpecView;
 import pers.tpec.tpecview.ViewManager;

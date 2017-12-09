@@ -1,6 +1,5 @@
-package com.yinzhi.colorbeans2.objects;
+package pers.tpec.games.colorbeans2.objects;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -9,6 +8,7 @@ import android.view.MotionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import pers.tpec.games.colorbeans2.scenes.MainScene;
 import pers.tpec.tpecview.SceneObject;
 import pers.tpec.tpecview.controller.ControllerClassifier;
 import pers.tpec.tpecview.controller.RectBorder;
@@ -19,7 +19,7 @@ import pers.tpec.tpecview.widgets.gif.Gif;
 import pers.tpec.tpecview.widgets.gif.SimpleGif;
 
 public class Map implements SceneObject, ControllerClassifier.OnClickListener {
-    private static final int MAP_TOP = 100;
+    private static final int MAP_TOP = 280;
 
     private static final int STATE_NULL = 0;
     private static final int STATE_SELECTED = 1;
@@ -27,7 +27,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     private static final int STATE_NEW = 3;
     private static final int STATE_REMOVE = 4;
 
-    private static final int movingInterval = 10;
+    private static final int movingInterval = 4;
 
     private int state;
     private int selectedId;
@@ -37,27 +37,24 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
 
     private ControllerClassifier controllerClassifier;
 
-    private NextBeans nextBeans;
+    private MainScene mainScene;
 
     private List<Integer> movingPath;
 
 
-    public Map(NextBeans nextBeans) {
+    public Map(MainScene mainScene) {
+        this.mainScene = mainScene;
         mgs = new MapGrid[81];
         Paint paint = new Paint();
-        Rect rectSrc = new Rect(0, 0, 80, 80);
         for (int i = 0; i < mgs.length; i++) {
             int ix = i % 9;
             int iy = i / 9;
-            mgs[i] = new MapGrid(ix * 80, iy * 80 + MAP_TOP);
-            mgs[i].paint = paint;
-            mgs[i].rectSrc = rectSrc;
+            mgs[i] = new MapGrid(ix * 80, iy * 80 + MAP_TOP, paint);
         }
         controllerClassifier = new ControllerClassifier();
         controllerClassifier.setBorder(new RectBorder(0, MAP_TOP, 720, 720))
                 .setOnClickListener(this);
         state = STATE_NULL;
-        this.nextBeans = nextBeans;
     }
 
     public void newGame() {
@@ -65,7 +62,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         for (MapGrid mg : mgs) {
             mg.setValue(MapGrid.VALUE_VOID);
         }
-        nextBeans.generateNewRound(4);
+        mainScene.getNextBeans().generateNewRound(5);
         createNewBeans();
     }
 
@@ -110,7 +107,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
 
     private void createNewBeans() {
         state = STATE_NEW;
-        List<Integer> nb = nextBeans.getNextBeans();
+        List<Integer> nb = mainScene.getNextBeans().getNextBeans();
         Rand rand = new SimpleRand();
         for (Integer i : nb) {
             int p;
@@ -128,6 +125,19 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
 
     private void gameOver() {
         // TODO: 2017/12/8  
+    }
+
+    private void finishNewBeans() {
+        if (state == STATE_NEW) {
+            state = STATE_NULL;
+            mainScene.getNextBeans().generateNewRound(3);
+        }
+    }
+
+    private void finishRemoveBeans() {
+        if (state == STATE_REMOVE) {
+            state = STATE_NULL;
+        }
     }
 
     @Override
@@ -150,16 +160,20 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
                 if (!mgs[i].isVoid()) {
                     state = STATE_SELECTED;
                     selectedId = i;
+                    mgs[i].setSelected(true);
                 }
                 break;
             case STATE_SELECTED:
                 if (!mgs[i].isVoid()) {
+                    mgs[selectedId].setSelected(false);
                     selectedId = i;
+                    mgs[i].setSelected(true);
                 } else {
                     AStarPathFinding2d pathFinding = new AStarPathFinding2d();
                     pathFinding.setMap(getMap(), 9);
                     movingPath = pathFinding.getPath(selectedId, i);
                     if (!movingPath.isEmpty()) {
+                        mgs[selectedId].setSelected(false);
                         state = STATE_MOVING;
                         movingIndex = 0;
                         movingFrame = movingInterval;
@@ -260,7 +274,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     public void gifFinish(Gif gif) {
         switch (state) {
             case STATE_NEW:
-                nextBeans.generateNewRound(3);
+                mainScene.getNextBeans().generateNewRound(3);
                 state = STATE_NULL;
                 break;
             case STATE_REMOVE:
@@ -272,10 +286,10 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     }
 
     class MapGrid implements Gif.OnFinishListener {
+        static final int FADE_SPEED = 8;
         static final int VALUE_VOID = 0;
 
-        Gif gif;
-        Bitmap bmpBg;
+        Gif gifBg;
         Rect rectSrc;
         Rect rectDst;
         Paint paint;
@@ -283,31 +297,55 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         int value;
         int gridState;
 
-        MapGrid(int left, int top) {
+        int flashIndex;
+
+        MapGrid(int left, int top, Paint paint) {
             this.rectDst = new Rect(left, top, left + 80, top + 80);
-            gif = new SimpleGif();
-            gif.setOnFinishListener(this);
+            gifBg = new SimpleGif();
+            gifBg.setMode(Gif.MODE_RETURN, false, 4)
+                    .setPaint(paint)
+                    .setRes(mainScene.getBmp(mainScene.getBmpBeanBg()), Gif.RES_MODE_HORIZON, 6)
+                    .setRectDst(rectDst);
+            this.paint = new Paint();
+            this.rectSrc = new Rect(0, 0, 80, 80);
+        }
+
+        void setSelected(boolean selected) {
+            if (selected) {
+                gifBg.play();
+            } else {
+                gifBg.pause();
+                gifBg.setFrame(0);
+            }
         }
 
         void setStateNew(int color) {
+            setValue(color);
+            gridState = STATE_NEW;
+            flashIndex = 0;
+            paint.setAlpha(0);
             // TODO: 2017/12/8  
         }
 
         void setStateRemove() {
             gridState = STATE_REMOVE;
+            flashIndex = 256 / FADE_SPEED;
             // TODO: 2017/12/8  
         }
 
         void setValue(int value) {
             this.value = value;
+            if (value != VALUE_VOID) {
+                rectSrc.offsetTo((value - 1) * 80, 0);
+            }
             // TODO: 2017/12/8
         }
 
         void drawSelf(Canvas canvas) {
-            if (bmpBg != null) {
-                canvas.drawBitmap(bmpBg, rectSrc, rectDst, paint);
+            gifBg.drawSelf(canvas);
+            if (value != VALUE_VOID) {
+                canvas.drawBitmap(mainScene.getBmp(mainScene.getBmpBeans()), rectSrc, rectDst, paint);
             }
-            gif.drawSelf(canvas);
         }
 
         @Override
@@ -319,7 +357,30 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         }
 
         void logicSelf() {
-            gif.logicSelf();
+            gifBg.logicSelf();
+            switch (gridState) {
+                case STATE_NEW:
+                    flashIndex++;
+                    if (flashIndex >= 256 / FADE_SPEED) {
+                        paint.setAlpha(255);
+                        gridState = STATE_NULL;
+                        finishNewBeans();
+                    } else {
+                        paint.setAlpha(FADE_SPEED * flashIndex);
+                    }
+                    break;
+                case STATE_REMOVE:
+                    flashIndex--;
+                    if (flashIndex <= 0) {
+                        paint.setAlpha(0);
+                        gridState = STATE_NULL;
+                        setValue(VALUE_VOID);
+                        finishRemoveBeans();
+                    } else {
+                        paint.setAlpha(FADE_SPEED * flashIndex);
+                    }
+                    break;
+            }
         }
 
         boolean isVoid() {

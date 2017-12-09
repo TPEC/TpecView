@@ -73,7 +73,9 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
             this.scene.unload();
         }
         this.scene = scene;
+        setController(scene);
         this.scene.load();
+        LOG.info("setScene:" + scene.toString());
         return this;
     }
 
@@ -206,7 +208,9 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
                     }
                     scene = sceneBack;
                     sceneBack = null;
+                    setController(scene);
                     scene.load();
+                    LOG.info("switch to scene:" + scene.toString());
                 }
                 if (scene != null) {
                     scene.logic();

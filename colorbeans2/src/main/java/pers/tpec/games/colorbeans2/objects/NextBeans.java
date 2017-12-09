@@ -1,4 +1,4 @@
-package com.yinzhi.colorbeans2.objects;
+package pers.tpec.games.colorbeans2.objects;
 
 import android.graphics.Canvas;
 import android.view.MotionEvent;
@@ -6,6 +6,7 @@ import android.view.MotionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import pers.tpec.games.colorbeans2.scenes.MainScene;
 import pers.tpec.tpecview.SceneObject;
 import pers.tpec.tpecview.utils.rand.Rand;
 import pers.tpec.tpecview.utils.rand.SimpleRand;
@@ -15,11 +16,17 @@ public class NextBeans implements SceneObject {
 
     private List<Integer> nextBeans = new ArrayList<>();
 
+    private MainScene mainScene;
+
+    public NextBeans(MainScene mainScene) {
+        this.mainScene = mainScene;
+    }
+
     public void generateNewRound(int amount) {
         Rand rand = new SimpleRand();
         nextBeans.clear();
         for (int i = 0; i < amount; i++) {
-            nextBeans.add(rand.i(BEAN_TYPE_COUNT));
+            nextBeans.add(rand.i(1, BEAN_TYPE_COUNT + 1));
         }
     }
 
