@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -195,6 +196,11 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
         } else {
             return false;
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return controller != null && controller.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event);
     }
 
     @Override

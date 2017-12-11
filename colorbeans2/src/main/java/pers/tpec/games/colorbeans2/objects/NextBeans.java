@@ -1,6 +1,7 @@
 package pers.tpec.games.colorbeans2.objects;
 
 import android.graphics.Canvas;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
@@ -46,6 +47,11 @@ public class NextBeans implements SceneObject {
 
     @Override
     public boolean onTouch(MotionEvent event) {
+        return false;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         return false;
     }
 

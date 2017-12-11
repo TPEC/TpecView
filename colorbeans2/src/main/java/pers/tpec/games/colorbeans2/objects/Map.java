@@ -1,8 +1,10 @@
 package pers.tpec.games.colorbeans2.objects;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import pers.tpec.tpecview.utils.rand.Rand;
 import pers.tpec.tpecview.utils.rand.SimpleRand;
 import pers.tpec.tpecview.widgets.gif.Gif;
 import pers.tpec.tpecview.widgets.gif.SimpleGif;
+import pers.tpec.tpecview.widgets.particles.ParticleFactory;
 
 public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     private static final int MAP_TOP = 280;
@@ -98,7 +101,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
                         for (Integer i : rl) {
                             mgs[i].setStateRemove();
                         }
-                        // TODO: 2017/12/8 add score
+                        mainScene.getScoreBoard().addScoreByRemove(rl.size());
                     }
                 }
             }
@@ -146,6 +149,11 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     }
 
     @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return false;
+    }
+
+    @Override
     public boolean isNull() {
         return false;
     }
@@ -176,7 +184,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
                         mgs[selectedId].setSelected(false);
                         state = STATE_MOVING;
                         movingIndex = 0;
-                        movingFrame = movingInterval;
+                        movingFrame = 1;
                     }
                 }
                 break;
@@ -330,6 +338,35 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         void setStateRemove() {
             gridState = STATE_REMOVE;
             flashIndex = 256 / FADE_SPEED;
+            int color;
+            switch (value) {
+                case 1:
+                    color = Color.argb(255, 159, 0, 0);
+                    break;
+                case 2:
+                    color = Color.argb(255, 0, 159, 0);
+                    break;
+                case 3:
+                    color = Color.argb(255, 0, 0, 159);
+                    break;
+                case 4:
+                    color = Color.argb(255, 159, 159, 0);
+                    break;
+                case 5:
+                    color = Color.argb(255, 159, 0, 159);
+                    break;
+                case 6:
+                    color = Color.argb(255, 0, 159, 159);
+                    break;
+                case 7:
+                    color = Color.argb(255, 95, 95, 95);
+                    break;
+                default:
+                    color = 0;
+            }
+            mainScene.addSceneObject2(ParticleFactory.createFireworkEffects(
+                    64f, rectDst.centerX(), rectDst.centerY(), 3f, 2.5f, color
+            ).playSetNull(2));
             // TODO: 2017/12/8  
         }
 

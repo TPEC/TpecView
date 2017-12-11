@@ -3,8 +3,8 @@ package pers.tpec.games.colorbeans2;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.WindowManager;
-
 
 import pers.tpec.games.colorbeans2.scenes.MenuScene;
 import pers.tpec.tpecview.ResManager;
@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
         ViewManager.getInstance().setActivity(MainActivity.class);
         ResManager.getInstance().init(getResources());
@@ -28,6 +29,11 @@ public class MainActivity extends AppCompatActivity {
         tpecView.setScene(menuScene);
 
         setContentView(tpecView);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return tpecView != null && tpecView.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event);
     }
 
     @Override

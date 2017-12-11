@@ -1,6 +1,8 @@
 package pers.tpec.tpecview.controller;
 
+import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -96,6 +98,11 @@ public class ControllerClassifier implements Controller {
             }
             return false;
         }
+        return false;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         return false;
     }
 

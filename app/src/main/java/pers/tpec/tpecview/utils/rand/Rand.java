@@ -33,6 +33,6 @@ public abstract class Rand {
 
     public abstract double d(double min, double max);
 
-    public abstract void setSeed(long seed);
+    public abstract Rand setSeed(long seed);
 
 }

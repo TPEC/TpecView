@@ -26,7 +26,8 @@ public class SimpleRand extends Rand {
     }
 
     @Override
-    public void setSeed(long seed) {
+    public Rand setSeed(long seed) {
         rand.setSeed(seed);
+        return this;
     }
 }

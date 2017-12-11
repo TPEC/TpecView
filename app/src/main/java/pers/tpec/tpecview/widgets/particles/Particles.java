@@ -38,8 +38,8 @@ public abstract class Particles implements SceneObject {
         this.velocityRange = velocityRange;
         this.gravityX = gravityX;
         this.gravityY = gravityY;
-        this.angle = (float) (angle * Math.PI / 180);
-        this.angleRange = (float) (angleRange * Math.PI / 180);
+        this.angle = (float) (angle * Math.PI / 180f);
+        this.angleRange = (float) (angleRange * Math.PI / 180f);
         this.size = size;
         this.sizeRange = sizeRange;
         timeLeft = 0;

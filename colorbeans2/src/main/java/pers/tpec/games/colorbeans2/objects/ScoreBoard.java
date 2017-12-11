@@ -1,18 +1,27 @@
-package pers.tpec.tpecview.widgets;
+package pers.tpec.games.colorbeans2.objects;
 
 import android.graphics.Canvas;
-import android.graphics.Rect;
-import android.text.Layout;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.View;
-import android.widget.LinearLayout;
 
+import pers.tpec.games.colorbeans2.scenes.MainScene;
 import pers.tpec.tpecview.SceneObject;
+import pers.tpec.tpecview.widgets.Label;
 
-public class Label implements SceneObject {
-    private Rect rectDst;
-    private String string;
+public class ScoreBoard implements SceneObject {
+    private MainScene mainScene;
+
+    private Label label;
+
+    private int score;
+
+    public ScoreBoard(MainScene mainScene) {
+        this.mainScene = mainScene;
+    }
+
+    public void addScoreByRemove(final int count) {
+
+    }
 
     @Override
     public void drawSelf(Canvas canvas) {

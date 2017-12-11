@@ -6,6 +6,7 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import pers.tpec.tpecview.SceneObject;
@@ -91,6 +92,11 @@ public class Button implements SceneObject {
     @Override
     public boolean onTouch(MotionEvent event) {
         return controllerClassifier.onTouch(event);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return false;
     }
 
     @Override

@@ -2,14 +2,21 @@ package pers.tpec.tpecview.widgets.particles;
 
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.view.KeyEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.logging.Logger;
+
+import pers.tpec.tpecview.utils.rand.Rand;
+import pers.tpec.tpecview.utils.rand.SimpleRand;
 
 public class ColorParticles extends Particles {
+    private static final Logger LOG = Logger.getLogger(ColorParticles.class.getName());
+
     protected final List<ColorParticleUnit> cpu = new ArrayList<>();
     protected int[] color;
     protected float[] colorAtTime;
@@ -66,17 +73,17 @@ public class ColorParticles extends Particles {
     }
 
     protected void addParticle() {
-        Random rnd = new Random();
-        float count = rnd.nextFloat() * countPerFrameRange + countPerFrame;
+        Rand rand = new SimpleRand();
+        float count = rand.f() * countPerFrameRange + countPerFrame;
         float deltaPathLength = (count == 0) ? 0 : deltaStartPath * startPathMeasure.getLength() / count;
         synchronized (cpu) {
-            for (; count >= 1 || count > rnd.nextFloat(); count--) {
-                int lifeTime = rnd.nextInt(lifeTimeRange) + this.lifeTime;
-                float angle = rnd.nextFloat() * angleRange + this.angle;
-                float velocity = rnd.nextFloat() * velocityRange + this.velocity;
+            for (; count >= 1 || count > rand.f(); count--) {
+                int lifeTime = rand.i(lifeTimeRange) + this.lifeTime;
+                float angle = rand.f() * angleRange + this.angle;
+                float velocity = rand.f() * velocityRange + this.velocity;
                 float vx = (float) (velocity * Math.cos(angle));
                 float vy = (float) (velocity * Math.sin(angle));
-                float size = rnd.nextFloat() * sizeRange + this.size;
+                float size = rand.f() * sizeRange + this.size;
                 float[] pos = new float[2];
                 startPathL += deltaPathLength;
                 while (startPathL > startPathMeasure.getLength()) {
@@ -134,12 +141,12 @@ public class ColorParticles extends Particles {
                     } else {
                         float tp = u.getTimeSpent();
                         if (tp < colorAtTime[u.colorIndex]) {
-                            u.color = getColorBetween(color[u.colorIndex - 1], color[u.colorIndex],
+                            u.color = ParticleFactory.getColorBetween(color[u.colorIndex - 1], color[u.colorIndex],
                                     (tp - colorAtTime[u.colorIndex - 1]) / (colorAtTime[u.colorIndex] - colorAtTime[u.colorIndex - 1]));
                         } else {
                             u.color = (tp == colorAtTime[u.colorIndex])
                                     ? color[u.colorIndex]
-                                    : getColorBetween(color[u.colorIndex], color[u.colorIndex + 1],
+                                    : ParticleFactory.getColorBetween(color[u.colorIndex], color[u.colorIndex + 1],
                                     (tp - colorAtTime[u.colorIndex]) / (colorAtTime[u.colorIndex + 1] - colorAtTime[u.colorIndex]));
                             u.colorIndex++;
                         }
@@ -157,6 +164,11 @@ public class ColorParticles extends Particles {
     }
 
     @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return false;
+    }
+
+    @Override
     public final void drawSelf(Canvas canvas) {
         synchronized (cpu) {
             for (ColorParticleUnit u : cpu) {
@@ -166,14 +178,6 @@ public class ColorParticles extends Particles {
         }
     }
 
-    private static int getColorBetween(final int color1, final int color2, final float f) {
-        int colorA = (int) ((float) ((color1 >> 24) & 0xff) * (1 - f) + (float) ((color2 >> 24) & 0xff) * f);
-        int colorR = (int) ((float) ((color1 >> 16) & 0xff) * (1 - f) + (float) ((color2 >> 16) & 0xff) * f);
-        int colorG = (int) ((float) ((color1 >> 8) & 0xff) * (1 - f) + (float) ((color2 >> 8) & 0xff) * f);
-        int colorB = (int) ((float) (color1 & 0xff) * (1 - f) + (float) (color2 & 0xff) * f);
-
-        return (colorA << 24) | (colorR << 16) | (colorG << 8) | colorB;
-    }
 
     protected class ColorParticleUnit extends Particles.ParticleUnit {
         public int color;
