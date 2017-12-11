@@ -11,6 +11,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.lang.reflect.InvocationTargetException;
+
 import pers.tpec.tpecview.Scene;
 import pers.tpec.tpecview.TpecView;
 import pers.tpec.tpecview.controller.Border;
