@@ -1,5 +1,6 @@
 package pers.tpec.games.colorbeans2.objects;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -35,6 +36,8 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     private int state;
     private int selectedId;
 
+    private Bitmap bmpBeans;
+
     private MapGrid[] mgs;
     private int mgVoidLeft;
 
@@ -47,6 +50,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
 
     public Map(MainScene mainScene) {
         this.mainScene = mainScene;
+        this.bmpBeans = mainScene.getBmp(mainScene.getBmpBeans());
         mgs = new MapGrid[81];
         Paint paint = new Paint();
         for (int i = 0; i < mgs.length; i++) {
@@ -381,7 +385,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         void drawSelf(Canvas canvas) {
             gifBg.drawSelf(canvas);
             if (value != VALUE_VOID) {
-                canvas.drawBitmap(mainScene.getBmp(mainScene.getBmpBeans()), rectSrc, rectDst, paint);
+                canvas.drawBitmap(bmpBeans, rectSrc, rectDst, paint);
             }
         }
 

@@ -48,7 +48,7 @@ public class MenuScene extends Scene implements ControllerClassifier.OnClickList
     public void logic() {
         super.logic();
         try {
-            switchScene(MainScene.class);
+            switchScene(TestScene.class);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             e.printStackTrace();
         }
