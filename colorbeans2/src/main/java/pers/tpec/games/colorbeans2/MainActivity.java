@@ -10,6 +10,7 @@ import pers.tpec.games.colorbeans2.scenes.MenuScene;
 import pers.tpec.tpecview.ResManager;
 import pers.tpec.tpecview.TpecView;
 import pers.tpec.tpecview.ViewManager;
+import pers.tpec.tpecview.utils.SharedPreferencesUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
         ViewManager.getInstance().setActivity(MainActivity.class);
         ResManager.getInstance().init(getResources());
+        SharedPreferencesUtil.setSpName("ColorBeans2");
 
         tpecView = new TpecView(this.getBaseContext(), 720, 1280, TpecView.SCALEMOD_PRESERVE);
         MenuScene menuScene = new MenuScene(tpecView);

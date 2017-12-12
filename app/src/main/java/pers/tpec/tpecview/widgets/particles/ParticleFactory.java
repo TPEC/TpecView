@@ -36,7 +36,7 @@ public final class ParticleFactory {
         return new ColorParticles(7f, 3f,
                 (int) (lifeTime * 0.8f), (int) (lifeTime * 0.45f),
                 x, y,
-                v * 0.5f, v * 0.5f,
+                v * 0.1f, v * 0.9f,
                 0, 0.1f,
                 0, 360,
                 6f * size, 0.5f * size,

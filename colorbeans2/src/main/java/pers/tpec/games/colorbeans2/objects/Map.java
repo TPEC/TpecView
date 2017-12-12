@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import pers.tpec.games.colorbeans2.GameScenes;
 import pers.tpec.games.colorbeans2.scenes.MainScene;
 import pers.tpec.tpecview.SceneObject;
 import pers.tpec.tpecview.controller.ControllerClassifier;
@@ -30,6 +31,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     private static final int STATE_MOVING = 2;
     private static final int STATE_NEW = 3;
     private static final int STATE_REMOVE = 4;
+    private static final int STATE_GAME_OVER = 5;
 
     private static final int movingInterval = 4;
 
@@ -48,8 +50,8 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     private List<Integer> movingPath;
 
 
-    public Map(MainScene mainScene) {
-        this.mainScene = mainScene;
+    public Map() {
+        this.mainScene = GameScenes.getInstance().getMainScene();
         this.bmpBeans = mainScene.getBmp(mainScene.getBmpBeans());
         mgs = new MapGrid[81];
         Paint paint = new Paint();
@@ -71,6 +73,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         }
         mainScene.getNextBeans().generateNewRound(5);
         createNewBeans();
+        mainScene.getScoreBoard().clearScore();
     }
 
     @Override
@@ -85,6 +88,9 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
 
     @Override
     public void logicSelf() {
+        if (state == STATE_GAME_OVER) {
+            return;
+        }
         for (MapGrid mg : mgs) {
             mg.logicSelf();
         }
@@ -131,6 +137,8 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     }
 
     private void gameOver() {
+        state = STATE_GAME_OVER;
+        mainScene.getGameOverScene().show();
         // TODO: 2017/12/8  
     }
 
@@ -138,6 +146,14 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         if (state == STATE_NEW) {
             state = STATE_NULL;
             mainScene.getNextBeans().generateNewRound(3);
+            List<Integer> rl = checkRemove();
+            if (!rl.isEmpty()) {
+                state = STATE_REMOVE;
+                mgVoidLeft += rl.size();
+                for (Integer i : rl) {
+                    mgs[i].setStateRemove();
+                }
+            }
         }
     }
 
@@ -216,6 +232,8 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
                     for (int k = j + 1; k < 9; k++) {
                         if (mgs[i * 9 + k].value == base) {
                             comb++;
+                        } else {
+                            break;
                         }
                     }
                     if (comb >= 5) {
@@ -233,6 +251,8 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
                     for (int k = j + 1; k < 9; k++) {
                         if (mgs[i + k * 9].value == base) {
                             comb++;
+                        } else {
+                            break;
                         }
                     }
                     if (comb >= 5) {
@@ -252,6 +272,8 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
                     for (int k = 1; i + k < 9 && j + k < 9; k++) {
                         if (mgs[(i + k) * 9 + j + k].value == base) {
                             comb++;
+                        } else {
+                            break;
                         }
                     }
                     if (comb >= 5) {
@@ -269,6 +291,8 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
                     for (int k = 1; i + k < 9 && j - k >= 0; k++) {
                         if (mgs[(i + k) * 9 + j - k].value == base) {
                             comb++;
+                        } else {
+                            break;
                         }
                     }
                     if (comb >= 5) {
@@ -369,7 +393,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
                     color = 0;
             }
             mainScene.addSceneObject2(ParticleFactory.createFireworkEffects(
-                    64f, rectDst.centerX(), rectDst.centerY(), 3f, 2.5f, color
+                    50f, rectDst.centerX(), rectDst.centerY(), 3f, 1.5f, color
             ).playSetNull(2));
             // TODO: 2017/12/8  
         }
@@ -378,6 +402,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
             this.value = value;
             if (value != VALUE_VOID) {
                 rectSrc.offsetTo((value - 1) * 80, 0);
+                paint.setAlpha(255);
             }
             // TODO: 2017/12/8
         }

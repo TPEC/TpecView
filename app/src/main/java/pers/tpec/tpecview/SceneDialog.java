@@ -1,6 +1,7 @@
 package pers.tpec.tpecview;
 
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.view.MotionEvent;
 
@@ -9,18 +10,30 @@ import pers.tpec.tpecview.controller.ControllerClassifier;
 
 public abstract class SceneDialog extends Scene
         implements SceneObject, ControllerClassifier.OnClickListener {
-    private Border border;
+    private Rect border;
     private ControllerClassifier controllerClassifier;
 
     private boolean force;  //是否强制：否-点击其他地方可以直接关闭
 
     protected boolean isNull;
 
-    public Border getBorder() {
+    private boolean shown = false;
+
+    public SceneDialog show() {
+        shown = true;
+        return this;
+    }
+
+    public SceneDialog hide() {
+        shown = false;
+        return this;
+    }
+
+    public Rect getBorder() {
         return border;
     }
 
-    public SceneDialog setBorder(Border border) {
+    public SceneDialog setBorder(Rect border) {
         this.border = border;
         return this;
     }
@@ -48,22 +61,26 @@ public abstract class SceneDialog extends Scene
 
     @Override
     public final void drawSelf(Canvas canvas) {
-        draw(canvas);
+        if (shown) {
+            draw(canvas);
+        }
     }
 
     @Override
     public final void logicSelf() {
-        logic();
+        if (shown) {
+            logic();
+        }
     }
 
     @Override
     public boolean onTouch(MotionEvent event) {
-        return !super.onTouch(event) && controllerClassifier.onTouch(event);
+        return shown && !super.onTouch(event) && controllerClassifier.onTouch(event);
     }
 
     @Override
     public boolean click(int x, int y) {
-        if (!force && !border.inside(x, y)) {
+        if (!force && !border.contains(x, y)) {
             isNull = true;
             return true;
         }

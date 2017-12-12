@@ -1,12 +1,16 @@
 package pers.tpec.games.colorbeans2.objects;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import pers.tpec.games.colorbeans2.GameScenes;
 import pers.tpec.games.colorbeans2.scenes.MainScene;
 import pers.tpec.tpecview.SceneObject;
 import pers.tpec.tpecview.utils.rand.Rand;
@@ -15,12 +19,25 @@ import pers.tpec.tpecview.utils.rand.SimpleRand;
 public class NextBeans implements SceneObject {
     public static final int BEAN_TYPE_COUNT = 6;
 
+    private static final int NEXT_BEAN_TOP = 150;
+
     private List<Integer> nextBeans = new ArrayList<>();
 
     private MainScene mainScene;
 
-    public NextBeans(MainScene mainScene) {
-        this.mainScene = mainScene;
+    private Bitmap bmpBeans;
+    private Bitmap bmpBeanBg;
+
+    private Rect rectSrc, rectDst;
+    private Paint paint;
+
+    public NextBeans() {
+        this.mainScene = GameScenes.getInstance().getMainScene();
+        bmpBeans = mainScene.getBmp(mainScene.getBmpBeans());
+        bmpBeanBg = mainScene.getBmp(mainScene.getBmpBeanBg());
+        rectSrc = new Rect(0, 0, 80, 80);
+        rectDst = new Rect(0, 0, 80, 80);
+        paint = new Paint();
     }
 
     public void generateNewRound(int amount) {
@@ -37,7 +54,14 @@ public class NextBeans implements SceneObject {
 
     @Override
     public void drawSelf(Canvas canvas) {
-
+        rectDst.offsetTo(360 - 40 * nextBeans.size(), NEXT_BEAN_TOP);
+        for (Integer i : nextBeans) {
+            rectSrc.offsetTo(0, 0);
+            canvas.drawBitmap(bmpBeanBg, rectSrc, rectDst, paint);
+            rectSrc.offsetTo((i - 1) * 80, 0);
+            canvas.drawBitmap(bmpBeans, rectSrc, rectDst, paint);
+            rectDst.offset(80, 0);
+        }
     }
 
     @Override

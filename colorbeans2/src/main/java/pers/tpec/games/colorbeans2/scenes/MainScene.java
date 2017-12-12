@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.view.KeyEvent;
 
 import pers.tpec.game.colorbeans2.R;
+import pers.tpec.games.colorbeans2.GameScenes;
 import pers.tpec.games.colorbeans2.objects.Map;
 import pers.tpec.games.colorbeans2.objects.NextBeans;
 import pers.tpec.games.colorbeans2.objects.ScoreBoard;
@@ -19,6 +20,7 @@ public class MainScene extends Scene {
     private int soMap;
     private int soNextBeans;
     private int soScoreBoard;
+    private int soGameOverScene;
 
     private int bmpBackground;
     private int bmpBeans;
@@ -29,6 +31,7 @@ public class MainScene extends Scene {
     public MainScene(@NonNull TpecView tpecView) {
         super(tpecView);
         paint = new Paint();
+        GameScenes.getInstance().setMainScene(this);
     }
 
     public NextBeans getNextBeans() {
@@ -41,6 +44,10 @@ public class MainScene extends Scene {
 
     public ScoreBoard getScoreBoard() {
         return (ScoreBoard) getSceneObject(soScoreBoard);
+    }
+
+    public GameOverScene getGameOverScene(){
+        return (GameOverScene) getSceneObject(soGameOverScene);
     }
 
     @Override
@@ -67,10 +74,10 @@ public class MainScene extends Scene {
         bmpBeans = loadBmp(R.mipmap.beans);
         bmpBeanBg = loadBmp(R.mipmap.bgg);
 
-        soNextBeans = addSceneObject(new NextBeans(this));
-        soMap = addSceneObject(new Map(this));
-        soScoreBoard = addSceneObject(new ScoreBoard(this));
-
+        soNextBeans = addSceneObject(new NextBeans());
+        soMap = addSceneObject(new Map());
+        soScoreBoard = addSceneObject(new ScoreBoard());
+        soGameOverScene = addSceneObject(new GameOverScene(tpecView));
 
         getMap().newGame();
     }
