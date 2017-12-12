@@ -1,7 +1,6 @@
 package pers.tpec.tpecview.widgets;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -28,6 +27,7 @@ public class Label implements SceneObject {
 
     private Rect rectDst;
     private Paint paint;
+    private Paint paintBg;
 
     private String text = "";
     private final List<String> textInLines;
@@ -42,13 +42,27 @@ public class Label implements SceneObject {
     private int alignLeft, alignTop, alignRight, alignBottom;
 
     private boolean visible;
+    private boolean background;
+    public static final int BACKGROUND_NULL = Integer.MIN_VALUE;
 
     public Label(@NonNull Rect rectDst) {
         paint = new Paint();
+        paintBg = new Paint();
         this.rectDst = rectDst;
         textInLines = new ArrayList<>();
         setAlign(0);
         visible = true;
+        background = false;
+    }
+
+    public Label setBackground(final int color) {
+        if (color == BACKGROUND_NULL) {
+            background = false;
+        } else {
+            background = true;
+            paintBg.setColor(color);
+        }
+        return this;
     }
 
     public Label setVisible(final boolean visible) {
@@ -180,9 +194,9 @@ public class Label implements SceneObject {
     @Override
     public void drawSelf(Canvas canvas) {
         if (visible) {
-            Paint p = new Paint();
-            p.setColor(Color.WHITE);
-            canvas.drawRect(rectDst, p);
+            if (background) {
+                canvas.drawRect(rectDst, paintBg);
+            }
             int x, y;
             Paint.FontMetrics fm = paint.getFontMetrics();
             spacing = multiSpacing * (fm.bottom - fm.top);
