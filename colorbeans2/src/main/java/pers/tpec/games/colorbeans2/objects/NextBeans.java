@@ -1,5 +1,6 @@
 package pers.tpec.games.colorbeans2.objects;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -8,11 +9,13 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import pers.tpec.games.colorbeans2.GameScenes;
 import pers.tpec.games.colorbeans2.scenes.MainScene;
 import pers.tpec.tpecview.SceneObject;
+import pers.tpec.tpecview.utils.SharedPreferencesUtil;
 import pers.tpec.tpecview.utils.rand.Rand;
 import pers.tpec.tpecview.utils.rand.SimpleRand;
 
@@ -50,6 +53,31 @@ public class NextBeans implements SceneObject {
 
     public List<Integer> getNextBeans() {
         return nextBeans;
+    }
+
+    public void loadGame() {
+        SharedPreferences sp = SharedPreferencesUtil.getSP(mainScene.getContext());
+        StringBuilder nbd = new StringBuilder();
+        Rand rand = new SimpleRand();
+        for (int i = 0; i < 3; i++) {
+            nbd.append((char) rand.i(1, BEAN_TYPE_COUNT + 1));
+        }
+        String nb = sp.getString("savedNextBeans", nbd.toString());
+        nextBeans.clear();
+        for (int i = 0; i < nb.length(); i++) {
+            nextBeans.add((int) nb.charAt(i));
+        }
+    }
+
+    public void saveGame() {
+        StringBuilder nb = new StringBuilder();
+        for (Integer i : nextBeans) {
+            int j = i;
+            nb.append((char) j);
+        }
+        java.util.Map<String, Object> m = new HashMap<>();
+        m.put("savedNextBeans", nb.toString());
+        SharedPreferencesUtil.save(mainScene.getContext(), m);
     }
 
     @Override

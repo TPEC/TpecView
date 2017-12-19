@@ -90,6 +90,11 @@ public class Label implements SceneObject {
         return this;
     }
 
+    public Label offsetTo(final int x, final int y) {
+        this.rectDst.offsetTo(x, y);
+        return this;
+    }
+
     public Label setAlign(final int align) {
         return setAlign(align, align, align, align);
     }

@@ -224,9 +224,10 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
                 startTime += targetInterval;
             }
             draw();
-            if (System.nanoTime() - startTime < targetInterval) {
+            long st = (targetInterval - (System.nanoTime() - startTime)) / 1000000;
+            if (st > 0) {
                 try {
-                    Thread.sleep((targetInterval - (System.nanoTime() - startTime)) / 1000000);
+                    Thread.sleep(st);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

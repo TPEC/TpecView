@@ -1,7 +1,10 @@
 package pers.tpec.games.colorbeans2.scenes;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.view.KeyEvent;
 
@@ -15,14 +18,12 @@ import pers.tpec.tpecview.SceneObject;
 import pers.tpec.tpecview.TpecView;
 
 public class MainScene extends Scene {
-    private int[][] map;
-
     private int soMap;
     private int soNextBeans;
     private int soScoreBoard;
     private int soGameOverScene;
 
-    private int bmpBackground;
+    private Bitmap bmpBackground;
     private int bmpBeans;
     private int bmpBeanBg;
 
@@ -46,13 +47,13 @@ public class MainScene extends Scene {
         return (ScoreBoard) getSceneObject(soScoreBoard);
     }
 
-    public GameOverScene getGameOverScene(){
+    public GameOverScene getGameOverScene() {
         return (GameOverScene) getSceneObject(soGameOverScene);
     }
 
     @Override
     public void draw(Canvas canvas) {
-        canvas.drawBitmap(getBmp(bmpBackground), 0, 0, paint);
+        canvas.drawBitmap(bmpBackground, 0, 0, paint);
         super.draw(canvas);
     }
 
@@ -68,25 +69,33 @@ public class MainScene extends Scene {
         return addSceneObject(sceneObject);
     }
 
+    public Context getContext() {
+        return tpecView.getContext();
+    }
+
     @Override
     public void load() {
-        bmpBackground = loadBmp(R.mipmap.bg);
+        bmpBackground = getBmp(loadBmp(R.mipmap.bgl));
         bmpBeans = loadBmp(R.mipmap.beans);
         bmpBeanBg = loadBmp(R.mipmap.bgg);
 
         soNextBeans = addSceneObject(new NextBeans());
         soMap = addSceneObject(new Map());
         soScoreBoard = addSceneObject(new ScoreBoard());
-        soGameOverScene = addSceneObject(new GameOverScene(tpecView));
+        soGameOverScene = addSceneObject(
+                new GameOverScene(tpecView)
+                        .setBorder(new Rect(80, 240, 640, 1040)));
 
-        getMap().newGame();
+        if (!getMap().loadGame()) {
+            getMap().newGame();
+        }
     }
 
     @Override
     public void unload() {
         clearSceneObject();
 
-        unloadBmpAll();
+//        unloadBmpAll();
     }
 
     @Override
@@ -101,6 +110,11 @@ public class MainScene extends Scene {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (!getMap().saveGame()) {
+                return true;
+            }
+        }
         return false;
     }
 }

@@ -1,5 +1,6 @@
 package pers.tpec.games.colorbeans2.objects;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import pers.tpec.games.colorbeans2.GameScenes;
@@ -16,6 +18,7 @@ import pers.tpec.games.colorbeans2.scenes.MainScene;
 import pers.tpec.tpecview.SceneObject;
 import pers.tpec.tpecview.controller.ControllerClassifier;
 import pers.tpec.tpecview.controller.RectBorder;
+import pers.tpec.tpecview.utils.SharedPreferencesUtil;
 import pers.tpec.tpecview.utils.pathfinding.AStarPathFinding2d;
 import pers.tpec.tpecview.utils.rand.Rand;
 import pers.tpec.tpecview.utils.rand.SimpleRand;
@@ -33,7 +36,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     private static final int STATE_REMOVE = 4;
     private static final int STATE_GAME_OVER = 5;
 
-    private static final int movingInterval = 4;
+    private static final int movingInterval = 2;
 
     private int state;
     private int selectedId;
@@ -118,6 +121,39 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         }
     }
 
+    public boolean loadGame() {
+        SharedPreferences sp = SharedPreferencesUtil.getSP(mainScene.getContext());
+        String sm = sp.getString("savedMap", "");
+        if (!sm.isEmpty()) {
+            for (int i = 0; i < sm.length(); i++) {
+                mgs[i].setValue((int) sm.charAt(i));
+            }
+        } else {
+            return false;
+        }
+        mainScene.getScoreBoard().setScore(sp.getInt("savedScore", 0));
+        mainScene.getScoreBoard().updateHighestScore();
+        mainScene.getNextBeans().loadGame();
+        state = STATE_NULL;
+        return true;
+    }
+
+    public boolean saveGame() {
+        if (state == STATE_NULL || state == STATE_SELECTED) {
+            java.util.Map<String, Object> m = new HashMap<>();
+            StringBuilder sm = new StringBuilder();
+            for (MapGrid mg : mgs) {
+                sm.append((char) mg.value);
+            }
+            m.put("savedMap", sm.toString());
+            m.put("savedScore", mainScene.getScoreBoard().getScore());
+            SharedPreferencesUtil.save(mainScene.getContext(), m);
+            mainScene.getNextBeans().saveGame();
+            return true;
+        }
+        return false;
+    }
+
     private void createNewBeans() {
         state = STATE_NEW;
         List<Integer> nb = mainScene.getNextBeans().getNextBeans();
@@ -139,6 +175,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     private void gameOver() {
         state = STATE_GAME_OVER;
         mainScene.getGameOverScene().show();
+
         // TODO: 2017/12/8  
     }
 
@@ -322,7 +359,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     }
 
     class MapGrid implements Gif.OnFinishListener {
-        static final int FADE_SPEED = 8;
+        static final int FADE_SPEED = 16;
         static final int VALUE_VOID = 0;
 
         Gif gifBg;
@@ -338,7 +375,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         MapGrid(int left, int top, Paint paint) {
             this.rectDst = new Rect(left, top, left + 80, top + 80);
             gifBg = new SimpleGif();
-            gifBg.setMode(Gif.MODE_RETURN, false, 4)
+            gifBg.setMode(Gif.MODE_RETURN, false, 2)
                     .setPaint(paint)
                     .setRes(mainScene.getBmp(mainScene.getBmpBeanBg()), Gif.RES_MODE_HORIZON, 6)
                     .setRectDst(rectDst);

@@ -20,12 +20,14 @@ public abstract class SceneDialog extends Scene
     private boolean shown = false;
 
     public SceneDialog show() {
+        this.load();
         shown = true;
         return this;
     }
 
     public SceneDialog hide() {
         shown = false;
+        this.unload();
         return this;
     }
 
@@ -62,7 +64,9 @@ public abstract class SceneDialog extends Scene
     @Override
     public final void drawSelf(Canvas canvas) {
         if (shown) {
+            canvas.translate(getBorder().left, getBorder().top);
             draw(canvas);
+            canvas.translate(-getBorder().left, -getBorder().top);
         }
     }
 
