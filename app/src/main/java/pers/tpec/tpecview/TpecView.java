@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -21,6 +20,7 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
     public static final int SCALEMOD_NULL = 0;
     public static final int SCALEMOD_STRETCH = 1;
     public static final int SCALEMOD_PRESERVE = 2;
+    public static final int SCALEMOD_MANUAL_SCALE = 3;
 
     private SurfaceHolder holder;
 
@@ -40,27 +40,67 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private long targetInterval = 16666667;
 
+    private boolean preloadScene = false;
+
     private Lock controllerLock = new ReentrantLock();
 
     /**
      * @param context      context of activity
      * @param windowWidth  target window width
      * @param windowHeight target window height
-     * @param scaleMod
+     * @param scaleMod     @SCALEMOD
      */
     public TpecView(Context context, int windowWidth, int windowHeight, int scaleMod) {
         super(context);
 
         this.context = context;
 
-        this.windowWidth = windowWidth;
-        this.windowHeight = windowHeight;
-        this.scaleMod = scaleMod;
+        this.resize(windowWidth, windowHeight)
+                .setScaleMod(scaleMod);
 
         holder = this.getHolder();
         holder.addCallback(this);
 
         paintBlack = new Paint();
+    }
+
+    /**
+     * @param windowWidth  target window width
+     * @param windowHeight target window height
+     * @return this
+     */
+    public TpecView resize(int windowWidth, int windowHeight) {
+        if (windowWidth <= 0 || windowHeight <= 0) {
+            return this;
+        }
+        this.windowWidth = windowWidth;
+        this.windowHeight = windowHeight;
+        LOG.info("Resize to (" + String.valueOf(windowWidth) + "," + String.valueOf(windowHeight) + ")");
+        if (screenHeight > 0) {
+            applyResolutionRatio();
+        }
+        return this;
+    }
+
+    /**
+     * @param scaleMod @SCALEMOD
+     * @return this
+     */
+    public TpecView setScaleMod(int scaleMod) {
+        this.scaleMod = scaleMod;
+        if (screenHeight > 0) {
+            applyResolutionRatio();
+        }
+        return this;
+    }
+
+    public TpecView setManualScale(float scaleWidth, float scaleHeight) {
+        if (scaleMod != SCALEMOD_MANUAL_SCALE) {
+            setScaleMod(SCALEMOD_MANUAL_SCALE);
+        }
+        this.scaleWidth = scaleWidth;
+        this.scaleHeight = scaleHeight;
+        return this;
     }
 
     /**
@@ -91,6 +131,24 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
         return this;
     }
 
+    /**
+     * Thread safe
+     * Preload scene before
+     *
+     * @param scene new scene
+     * @return this
+     */
+    final public TpecView switchAndPreloadScene(@NonNull final Scene scene) {
+        preloadScene = true;
+        this.sceneBack = scene;
+        scene.load();
+        return this;
+    }
+
+    /**
+     * @param controller @Controller
+     * @return this
+     */
     final public TpecView setController(final Controller controller) {
         controllerLock.lock();
         try {
@@ -101,6 +159,10 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
         return this;
     }
 
+    /**
+     * @param targetInterval nano second
+     * @return this
+     */
     final public TpecView setTargetInterval(final long targetInterval) {
         this.targetInterval = targetInterval;
         return this;
@@ -125,6 +187,7 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
             }
             scaleHeight = scaleWidth;
         }
+        LOG.info("scaleWidth:" + String.valueOf(scaleWidth) + ", scaleHeight:" + String.valueOf(scaleHeight));
     }
 
     private void draw() {
@@ -175,6 +238,7 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         screenWidth = width;
         screenHeight = height;
+        LOG.info("screenWidth:" + String.valueOf(screenWidth) + ", screenHeight:" + String.valueOf(screenHeight));
         applyResolutionRatio();
     }
 
@@ -199,11 +263,6 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        return controller != null && controller.onKeyDown(keyCode, event) || super.onKeyDown(keyCode, event);
-    }
-
-    @Override
     public void run() {
         long startTime = System.nanoTime() - targetInterval;
         while (threadFlag) {
@@ -215,7 +274,9 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
                     scene = sceneBack;
                     sceneBack = null;
                     setController(scene);
-                    scene.load();
+                    if (!preloadScene) {
+                        scene.load();
+                    }
                     LOG.info("switch to scene:" + scene.toString());
                 }
                 if (scene != null) {

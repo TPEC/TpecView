@@ -23,7 +23,7 @@ public class RectBorder implements Border {
     }
 
     @Override
-    public boolean inside(int x, int y) {
+    public boolean contains(int x, int y) {
         return rect != null && rect.contains(x, y);
     }
 }

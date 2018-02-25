@@ -11,7 +11,5 @@ public interface SceneObject {
 
     boolean onTouch(MotionEvent event);
 
-    boolean onKeyDown(int keyCode, KeyEvent event);
-
     boolean isNull();
 }

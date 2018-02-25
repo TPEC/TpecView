@@ -47,7 +47,8 @@ public class GameOverScene extends SceneDialog {
     }
 
     @Override
-    public SceneDialog show() {
+    public void show() {
+        super.show();
         getLblScore().setText("得分：" + String.valueOf(GameScenes.getInstance().getMainScene().getScoreBoard().getScore()));
         int no = GameScenes.getInstance().getMainScene().getScoreBoard().getScoreNo();
         if (no >= 0) {
@@ -56,7 +57,6 @@ public class GameOverScene extends SceneDialog {
             getLblNo().setText("继续努力！");
         }
         // TODO: 2017/12/12 scoreboard
-        return super.show();
     }
 
     @Override

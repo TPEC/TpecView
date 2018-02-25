@@ -1,1 +1,1 @@
-include ':app', ':colorbeans2'
+include ':app', ':pet'

@@ -74,7 +74,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         for (MapGrid mg : mgs) {
             mg.setValue(MapGrid.VALUE_VOID);
         }
-        mainScene.getNextBeans().generateNewRound(5);
+        mainScene.getNextBeans().generateNewRound(78);
         createNewBeans();
         mainScene.getScoreBoard().clearScore();
     }

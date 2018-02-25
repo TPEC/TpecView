@@ -1,8 +1,6 @@
 package pers.tpec.tpecview.controller;
 
-import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.View;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +18,7 @@ public class ControllerClassifier implements Controller {
 
     public ControllerClassifier() {
         enabled = true;
-        pointID=new HashSet<>();
+        pointID = new HashSet<>();
     }
 
     public boolean isEnabled() {
@@ -53,7 +51,7 @@ public class ControllerClassifier implements Controller {
             int action = event.getActionMasked();
             int index = event.getActionIndex();
             if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) {
-                if (border != null && border.inside((int) event.getX(index), (int) event.getY(index))) {
+                if (border != null && border.contains((int) event.getX(index), (int) event.getY(index))) {
                     pointID.add(event.getPointerId(index));
                     _click = pointID.size() == 1;
                     _scale = pointID.size() == 2;
@@ -71,7 +69,7 @@ public class ControllerClassifier implements Controller {
             } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_POINTER_UP) {
                 if (pointID.contains(event.getPointerId(index))) {
                     pointID.remove(event.getPointerId(index));
-                    if (_click && border != null && border.inside((int) event.getX(index), (int) event.getY(index))) {
+                    if (_click && border != null && border.contains((int) event.getX(index), (int) event.getY(index))) {
                         _click = false;
                         double dd = Math.sqrt(Math.pow(event.getX(index) - x0, 2) + Math.pow(event.getY(index) - y0, 2));
                         if (dd < 32) {
@@ -82,27 +80,22 @@ public class ControllerClassifier implements Controller {
                     }
                     _scale = false;
                 }
-            } else {
+            } else if (action == MotionEvent.ACTION_MOVE) {
                 if (_click) {//drag
                     if (onDragListener != null) {
-                        boolean f = onDragListener.drag((int)event.getX(index),(int) event.getY(index),
-                                (int)x0,(int)y0,
-                                (int)xd,(int)yd);
+                        boolean f = onDragListener.drag((int) event.getX(index), (int) event.getY(index),
+                                (int) x0, (int) y0,
+                                (int) xd, (int) yd);
                         xd = event.getX(index);
                         yd = event.getY(index);
                         return f;
                     }
                 } else if (_scale) {//scale
-
+                    // TODO: 2018/2/16  SCALE
                 }
             }
             return false;
         }
-        return false;
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
         return false;
     }
 

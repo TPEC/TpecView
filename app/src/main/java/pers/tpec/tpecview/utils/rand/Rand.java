@@ -13,25 +13,27 @@ public abstract class Rand {
 
     public abstract long l(long min, long max);
 
-    public float f() {
-        return f(0f, 1f);
-    }
+    public abstract float f();
 
     public float f(float max) {
-        return f(0f, max);
+        return f() * max;
     }
 
-    public abstract float f(float min, float max);
-
-    public double d() {
-        return d(0d, 1d);
+    public float f(float min, float max) {
+        return f() * (max - min) + min;
     }
+
+    public abstract double d();
 
     public double d(double max) {
-        return d(0d, max);
+        return d() * max;
     }
 
-    public abstract double d(double min, double max);
+    public double d(double min, double max) {
+        return d() * (max - min) + min;
+    }
+
+    public abstract boolean bln();
 
     public abstract Rand setSeed(long seed);
 

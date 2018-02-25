@@ -164,11 +164,6 @@ public class ColorParticles extends Particles {
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        return false;
-    }
-
-    @Override
     public final void drawSelf(Canvas canvas) {
         synchronized (cpu) {
             for (ColorParticleUnit u : cpu) {

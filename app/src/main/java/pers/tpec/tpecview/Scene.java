@@ -4,9 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.View;
 
 import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidParameterException;
@@ -100,18 +98,6 @@ public abstract class Scene implements Controller {
         synchronized (sceneObjects) {
             for (int i = 0; i < sceneObjects.size(); i++) {
                 if (sceneObjects.valueAt(i).onTouch(event)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        synchronized (sceneObjects) {
-            for (int i = 0; i < sceneObjects.size(); i++) {
-                if (sceneObjects.valueAt(i).onKeyDown(keyCode, event)) {
                     return true;
                 }
             }
