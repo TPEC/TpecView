@@ -25,8 +25,9 @@ import pers.tpec.tpecview.widgets.Label;
 public class ScoreBoard implements SceneObject {
     private static final int SCORE_BOARD_TOP = 1050;
 
-    private static final int VIEWED_SCORE_INTERVAL = 5;
+    private static final int VIEWED_SCORE_INTERVAL = 1;
     private static final float VIEWED_SCORE_SPEED = 0.2f;
+    private static final float VIEWED_SCORE_SPEED_MIN = 0.1f;
 
     private MainScene mainScene;
 
@@ -190,16 +191,16 @@ public class ScoreBoard implements SceneObject {
             viewedScoreIndex--;
             if (viewedScoreIndex <= 0) {
                 viewedScoreIndex = VIEWED_SCORE_INTERVAL;
-                if (Math.abs(viewedScore - (float) score) <= 0.1f) {
+                if (Math.abs(viewedScore - (float) score) <= VIEWED_SCORE_SPEED_MIN) {
                     viewedScore = score;
                 } else {
                     float addf = (float) score * VIEWED_SCORE_SPEED;
                     addf += viewedScore * (1f - VIEWED_SCORE_SPEED);
                     float add = addf - viewedScore;
-                    if (viewedScore < score && add < 0.1f) {
-                        add = 0.1f;
-                    } else if (viewedScore > score && add > -0.1f) {
-                        add = -0.1f;
+                    if (viewedScore < score && add < VIEWED_SCORE_SPEED_MIN) {
+                        add = VIEWED_SCORE_SPEED_MIN;
+                    } else if (viewedScore > score && add > -VIEWED_SCORE_SPEED_MIN) {
+                        add = -VIEWED_SCORE_SPEED_MIN;
                     }
                     viewedScore += add;
                 }
@@ -240,11 +241,6 @@ public class ScoreBoard implements SceneObject {
 
     @Override
     public boolean onTouch(MotionEvent event) {
-        return false;
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
         return false;
     }
 

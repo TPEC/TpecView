@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -164,7 +165,16 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
      * @return this
      */
     final public TpecView setTargetInterval(final long targetInterval) {
-        this.targetInterval = targetInterval;
+        if (targetInterval > 0) {
+            this.targetInterval = targetInterval;
+        }
+        return this;
+    }
+
+    final public TpecView setTargetFPS(final double targetFPS) {
+        if (targetFPS > 0 && targetFPS <= 1000000000.0) {
+            this.targetInterval = (long) (1000000000.0 / targetFPS);
+        }
         return this;
     }
 
@@ -260,6 +270,14 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
         } else {
             return false;
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (scene != null) {
+            return scene.onKeyDown(keyCode, event);
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override

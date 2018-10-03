@@ -103,11 +103,6 @@ public class NextBeans implements SceneObject {
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        return false;
-    }
-
-    @Override
     public boolean isNull() {
         return false;
     }

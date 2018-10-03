@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import java.lang.reflect.InvocationTargetException;
@@ -102,6 +103,10 @@ public abstract class Scene implements Controller {
                 }
             }
         }
+        return false;
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         return false;
     }
 

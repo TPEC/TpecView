@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ import pers.tpec.tpecview.widgets.gif.SimpleGif;
 import pers.tpec.tpecview.widgets.particles.ParticleFactory;
 
 public class Map implements SceneObject, ControllerClassifier.OnClickListener {
-    private static final int MAP_TOP = 280;
+    public static final int MAP_TOP = 280;
 
     private static final int STATE_NULL = 0;
     private static final int STATE_SELECTED = 1;
@@ -36,7 +35,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     private static final int STATE_REMOVE = 4;
     private static final int STATE_GAME_OVER = 5;
 
-    private static final int movingInterval = 2;
+    private static final int movingInterval = 1;
 
     private int state;
     private int selectedId;
@@ -74,9 +73,11 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         for (MapGrid mg : mgs) {
             mg.setValue(MapGrid.VALUE_VOID);
         }
-        mainScene.getNextBeans().generateNewRound(78);
+        mainScene.getNextBeans().generateNewRound(5);
         createNewBeans();
         mainScene.getScoreBoard().clearScore();
+
+//        gameOver();
     }
 
     @Override
@@ -124,17 +125,21 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     public boolean loadGame() {
         SharedPreferences sp = SharedPreferencesUtil.getSP(mainScene.getContext());
         String sm = sp.getString("savedMap", "");
-        if (!sm.isEmpty()) {
-            for (int i = 0; i < sm.length(); i++) {
-                mgs[i].setValue((int) sm.charAt(i));
-            }
-        } else {
+        if (sm.isEmpty()) {
             return false;
+        }
+        mgVoidLeft = 0;
+        for (int i = 0; i < sm.length(); i++) {
+            mgs[i].setValue((int) sm.charAt(i));
+            if (mgs[i].isVoid()) {
+                mgVoidLeft++;
+            }
         }
         mainScene.getScoreBoard().setScore(sp.getInt("savedScore", 0));
         mainScene.getScoreBoard().updateHighestScore();
         mainScene.getNextBeans().loadGame();
         state = STATE_NULL;
+        controllerClassifier.setEnabled(true);
         return true;
     }
 
@@ -154,11 +159,20 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         return false;
     }
 
+    public boolean cleanSavedGame() {
+        java.util.Map<String, Object> m = new HashMap<>();
+        m.put("savedMap", "");
+        m.put("savedScore", 0);
+        SharedPreferencesUtil.save(mainScene.getContext(), m);
+        return true;
+    }
+
     private void createNewBeans() {
         state = STATE_NEW;
+        controllerClassifier.setEnabled(true);
         List<Integer> nb = mainScene.getNextBeans().getNextBeans();
         Rand rand = new SimpleRand();
-        for (Integer i : nb) {
+        for (int i : nb) {
             int p;
             do {
                 p = rand.i(81);
@@ -174,6 +188,8 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
 
     private void gameOver() {
         state = STATE_GAME_OVER;
+        controllerClassifier.setEnabled(false);
+        cleanSavedGame();
         mainScene.getGameOverScene().show();
 
         // TODO: 2017/12/8  
@@ -203,11 +219,6 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     @Override
     public boolean onTouch(MotionEvent event) {
         return controllerClassifier.onTouch(event);
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        return false;
     }
 
     @Override
@@ -359,7 +370,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     }
 
     class MapGrid implements Gif.OnFinishListener {
-        static final int FADE_SPEED = 16;
+        static final int FADE_SPEED = 32;
         static final int VALUE_VOID = 0;
 
         Gif gifBg;
@@ -430,8 +441,8 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
                     color = 0;
             }
             mainScene.addSceneObject2(ParticleFactory.createFireworkEffects(
-                    50f, rectDst.centerX(), rectDst.centerY(), 3f, 1.5f, color
-            ).playSetNull(2));
+                    15, rectDst.centerX(), rectDst.centerY(), 6, 1.75f, color
+            ).playSetNull(1));
             // TODO: 2017/12/8  
         }
 

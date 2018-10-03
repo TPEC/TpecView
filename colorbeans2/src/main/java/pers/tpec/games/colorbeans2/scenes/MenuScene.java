@@ -11,9 +11,8 @@ import java.lang.reflect.InvocationTargetException;
 import pers.tpec.games.colorbeans2.GameScenes;
 import pers.tpec.tpecview.Scene;
 import pers.tpec.tpecview.TpecView;
-import pers.tpec.tpecview.controller.Border;
 import pers.tpec.tpecview.controller.ControllerClassifier;
-import pers.tpec.tpecview.utils.SharedPreferencesUtil;
+import pers.tpec.tpecview.controller.TrueBorder;
 import pers.tpec.tpecview.widgets.particles.ParticleFactory;
 
 public class MenuScene extends Scene implements ControllerClassifier.OnClickListener {
@@ -23,12 +22,7 @@ public class MenuScene extends Scene implements ControllerClassifier.OnClickList
         super(tpecView);
         GameScenes.getInstance().setMenuScene(this);
 
-        controllerClassifier = new ControllerClassifier().setBorder(new Border() {
-            @Override
-            public boolean inside(int x, int y) {
-                return true;
-            }
-        }).setOnClickListener(this);
+        controllerClassifier = new ControllerClassifier().setBorder(new TrueBorder()).setOnClickListener(this);
     }
 
     @Override

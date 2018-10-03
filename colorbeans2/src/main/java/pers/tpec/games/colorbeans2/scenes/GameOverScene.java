@@ -29,12 +29,12 @@ public class GameOverScene extends SceneDialog {
         GameScenes.getInstance().setGameOverScene(this);
 
         paintBg = new Paint();
-        paintBg.setAlpha(255);
+        paintBg.setAlpha(191);
     }
 
     @Override
     public void draw(Canvas canvas) {
-        canvas.drawBitmap(bmpBg, rectSrc, getBorder(), paintBg);
+        canvas.drawBitmap(bmpBg, rectSrc, getBorderRect_offset(), paintBg);
         super.draw(canvas);
     }
 
@@ -65,18 +65,19 @@ public class GameOverScene extends SceneDialog {
         rectSrc = new Rect(0, 0, bmpBg.getWidth(), bmpBg.getHeight());
 
         lblScore = addSceneObject(
-                new Label(new Rect(0, 0, getBorder().width(), 100))
+                new Label(new Rect(0, 0, getBorderRect().width(), 120))
                         .setAntiAlias(true)
                         .setFontSize(50)
                         .setAlignStyle(Label.ALIGN_STYLE_MID, Label.ALIGN_STYLE_MID)
         );
         lblNo = addSceneObject(
-                new Label(new Rect(0, 100, getBorder().width(), 200))
+                new Label(new Rect(0, 100, getBorderRect().width(), 240))
                         .setAntiAlias(true)
+                        .setFontSize(40)
                         .setAlignStyle(Label.ALIGN_STYLE_MID, Label.ALIGN_STYLE_MID)
         );
         btnNewGame = addSceneObject(
-                new Button(new Rect(0, 0, 80, 80))
+                new Button(new Rect(0, 240, getBorderRect().width(), 360))
                         .setOnClickListener(new ControllerClassifier.OnClickListener() {
                             @Override
                             public boolean click(int x, int y) {
@@ -85,6 +86,7 @@ public class GameOverScene extends SceneDialog {
                                 return true;
                             }
                         })
+                        .setBmp(ResManager.getInstance().decodeResource(R.mipmap.beans))
         );
     }
 

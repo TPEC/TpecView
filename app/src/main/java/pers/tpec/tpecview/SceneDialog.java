@@ -5,9 +5,9 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.view.MotionEvent;
 
-import pers.tpec.tpecview.controller.Border;
 import pers.tpec.tpecview.controller.ControllerClassifier;
 import pers.tpec.tpecview.controller.RectBorder;
+import pers.tpec.tpecview.controller.TrueBorder;
 
 public abstract class SceneDialog extends Scene
         implements SceneObject, ControllerClassifier.OnClickListener {
@@ -35,8 +35,13 @@ public abstract class SceneDialog extends Scene
         return border.getRect();
     }
 
+    public Rect getBorderRect_offset() {
+        return new Rect(0, 0, border.getRect().width(), border.getRect().height());
+    }
+
     public SceneDialog setBorder(RectBorder border) {
         this.border = border;
+        controllerClassifier.setBorder(new RectBorder(getBorderRect_offset()));
         return this;
     }
 
@@ -53,12 +58,7 @@ public abstract class SceneDialog extends Scene
         super(tpecView);
         isNull = false;
         controllerClassifier = new ControllerClassifier();
-        controllerClassifier.setBorder(new Border() {
-            @Override
-            public boolean contains(int x, int y) {
-                return true;
-            }
-        }).setOnClickListener(this);
+        controllerClassifier.setBorder(new TrueBorder()).setOnClickListener(this);
     }
 
     @Override
@@ -79,7 +79,19 @@ public abstract class SceneDialog extends Scene
 
     @Override
     public boolean onTouch(MotionEvent event) {
-        return shown && !super.onTouch(event) && controllerClassifier.onTouch(event);
+        if (shown) {
+            event.setLocation(event.getX() - getBorderRect().left, event.getY() - getBorderRect().top);
+            if (super.onTouch(event)) {
+                return true;
+            } else {
+                if (controllerClassifier.onTouch(event)) {
+                    return true;
+                } else {
+                    event.setLocation(event.getX() + getBorderRect().left, event.getY() + getBorderRect().top);
+                }
+            }
+        }
+        return false;
     }
 
     @Override

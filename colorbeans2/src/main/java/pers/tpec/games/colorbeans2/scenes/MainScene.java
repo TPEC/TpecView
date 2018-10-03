@@ -3,6 +3,7 @@ package pers.tpec.games.colorbeans2.scenes;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
@@ -16,6 +17,7 @@ import pers.tpec.games.colorbeans2.objects.ScoreBoard;
 import pers.tpec.tpecview.Scene;
 import pers.tpec.tpecview.SceneObject;
 import pers.tpec.tpecview.TpecView;
+import pers.tpec.tpecview.controller.RectBorder;
 
 public class MainScene extends Scene {
     private int soMap;
@@ -29,9 +31,12 @@ public class MainScene extends Scene {
 
     private Paint paint;
 
+    private final Rect bmpBgRect = new Rect(0, 0, 720, Map.MAP_TOP);
+
     public MainScene(@NonNull TpecView tpecView) {
         super(tpecView);
         paint = new Paint();
+        paint.setColor(Color.GRAY);
         GameScenes.getInstance().setMainScene(this);
     }
 
@@ -53,7 +58,8 @@ public class MainScene extends Scene {
 
     @Override
     public void draw(Canvas canvas) {
-        canvas.drawBitmap(bmpBackground, 0, 0, paint);
+        canvas.drawBitmap(bmpBackground, bmpBgRect, bmpBgRect, paint);
+        canvas.drawRect(0, Map.MAP_TOP + 720, 720, 1280, paint);
         super.draw(canvas);
     }
 
@@ -84,8 +90,7 @@ public class MainScene extends Scene {
         soScoreBoard = addSceneObject(new ScoreBoard());
         soGameOverScene = addSceneObject(
                 new GameOverScene(tpecView)
-                        .setBorder(new Rect(80, 240, 640, 1040)));
-
+                        .setBorder(new RectBorder(80, 240, 560, 800)));
         if (!getMap().loadGame()) {
             getMap().newGame();
         }

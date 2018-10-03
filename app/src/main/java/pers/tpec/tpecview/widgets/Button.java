@@ -6,7 +6,6 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import pers.tpec.tpecview.SceneObject;
@@ -35,6 +34,7 @@ public class Button implements SceneObject {
 
     public Button setBmp(@NonNull Bitmap bmpBg) {
         this.bmpBg = bmpBg;
+        this.rectSrc = new Rect(0, 0, bmpBg.getWidth(), bmpBg.getHeight());
         return this;
     }
 
@@ -79,7 +79,8 @@ public class Button implements SceneObject {
             if (!controllerClassifier.isClickDown()) {
                 canvas.drawBitmap(bmpBg, rectSrc, rectDst, paint);
             } else {
-                canvas.drawBitmap(bmpBg, rectSrc, rectDst, paint);
+//                canvas.drawBitmap(bmpBg, rectSrc, rectDst, paint);
+                canvas.drawRect(rectDst, paint);
             }
         }
     }
@@ -91,6 +92,7 @@ public class Button implements SceneObject {
 
     @Override
     public boolean onTouch(MotionEvent event) {
+        System.out.println(event);
         return controllerClassifier.onTouch(event);
     }
 
