@@ -17,6 +17,8 @@ import pers.tpec.tpecview.controller.Controller;
 public abstract class Scene implements Controller {
     protected final TpecView tpecView;
 
+    protected int param;
+
     private final SparseArray<SceneObject> sceneObjects;
 
     private int lastPriority;
@@ -28,6 +30,10 @@ public abstract class Scene implements Controller {
         sceneObjects = new SparseArray<>();
         lastPriority = Integer.MAX_VALUE;
         bmpId = new ArrayList<>();
+    }
+
+    public void setParam(int param) {
+        this.param = param;
     }
 
     protected final int loadBmp(final int bmpId) {
@@ -115,7 +121,14 @@ public abstract class Scene implements Controller {
     }
 
     protected final void switchScene(@NonNull Class<? extends Scene> sceneClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        switchScene(sceneClass.getDeclaredConstructor(TpecView.class).newInstance(tpecView));
+        Scene scene = sceneClass.getDeclaredConstructor(TpecView.class).newInstance(tpecView);
+        switchScene(scene);
+    }
+
+    protected final void switchScene(@NonNull Class<? extends Scene> sceneClass, int param) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        Scene scene = sceneClass.getDeclaredConstructor(TpecView.class).newInstance(tpecView);
+        scene.setParam(param);
+        switchScene(scene);
     }
 
     protected final int addSceneObject(@NonNull SceneObject sceneObject) {

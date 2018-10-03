@@ -86,7 +86,7 @@ public class GameOverScene extends SceneDialog {
                                 return true;
                             }
                         })
-                        .setBmp(ResManager.getInstance().decodeResource(R.mipmap.beans))
+                        .setBmp(ResManager.getInstance().decodeResource(R.mipmap.beans2))
         );
     }
 

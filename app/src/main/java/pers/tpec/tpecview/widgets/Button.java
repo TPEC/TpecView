@@ -59,6 +59,10 @@ public class Button implements SceneObject {
         return this;
     }
 
+    public Rect getRectDst() {
+        return rectDst;
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -79,8 +83,7 @@ public class Button implements SceneObject {
             if (!controllerClassifier.isClickDown()) {
                 canvas.drawBitmap(bmpBg, rectSrc, rectDst, paint);
             } else {
-//                canvas.drawBitmap(bmpBg, rectSrc, rectDst, paint);
-                canvas.drawRect(rectDst, paint);
+                canvas.drawBitmap(bmpBg, rectSrc, rectDst, paint);
             }
         }
     }
@@ -92,7 +95,6 @@ public class Button implements SceneObject {
 
     @Override
     public boolean onTouch(MotionEvent event) {
-        System.out.println(event);
         return controllerClassifier.onTouch(event);
     }
 

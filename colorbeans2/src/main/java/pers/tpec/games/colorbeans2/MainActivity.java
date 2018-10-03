@@ -26,8 +26,8 @@ public class MainActivity extends AppCompatActivity {
         ResManager.getInstance().init(getResources());
         SharedPreferencesUtil.setSpName("ColorBeans2");
 
-        tpecView = new TpecView(this.getBaseContext(), 720, 1280, TpecView.SCALEMOD_PRESERVE);
-        tpecView.setTargetFPS(20.0);
+        tpecView = new TpecViewES(this.getBaseContext(), 720, 1280, TpecView.SCALEMOD_PRESERVE);
+        tpecView.setTargetFPS(15);
         MenuScene menuScene = new MenuScene(tpecView);
         tpecView.setScene(menuScene);
 

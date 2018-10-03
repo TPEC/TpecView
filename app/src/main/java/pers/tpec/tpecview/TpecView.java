@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 import pers.tpec.tpecview.controller.Controller;
 
 public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
-    private static final Logger LOG = Logger.getLogger(TpecView.class.getName());
+    protected static final Logger LOG = Logger.getLogger(TpecView.class.getName());
 
     public static final int SCALEMOD_NULL = 0;
     public static final int SCALEMOD_STRETCH = 1;
@@ -27,7 +27,7 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private Context context;
 
-    private boolean threadFlag;
+    protected volatile boolean threadFlag;
 
     private int screenWidth, screenHeight;
     private int windowWidth, windowHeight;
@@ -36,12 +36,12 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
 
     private Paint paintBlack;
 
-    private Scene scene = null, sceneBack = null;
+    protected Scene scene = null, sceneBack = null;
     private Controller controller = null;
 
-    private long targetInterval = 16666667;
+    protected long targetInterval = 16666667;
 
-    private boolean preloadScene = false;
+    protected boolean preloadScene = false;
 
     private Lock controllerLock = new ReentrantLock();
 
@@ -200,7 +200,7 @@ public class TpecView extends SurfaceView implements SurfaceHolder.Callback, Run
         LOG.info("scaleWidth:" + String.valueOf(scaleWidth) + ", scaleHeight:" + String.valueOf(scaleHeight));
     }
 
-    private void draw() {
+    protected void draw() {
         Canvas canvas = null;
         try {
             canvas = holder.lockCanvas();

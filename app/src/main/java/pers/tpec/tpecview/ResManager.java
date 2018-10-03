@@ -23,30 +23,36 @@ public class ResManager {
     }
 
     public int loadBmp(final Resources resources, final int bmpId) {
-        Integer id = getBmpId(bmpId);
+        Integer id = getIdByBmpId(bmpId);
         if (id == null) {
-            int i = getNewId();
+            id = getNewId();
             synchronized (bmp) {
                 Bitmap bitmap = decodeResource(resources, bmpId);
-                bmp.put(i, new BitmapBundle(bmpId, bitmap));
+                bmp.put(id, new BitmapBundle(bmpId, bitmap));
             }
-            return i;
+            return id;
         } else {
             return id;
         }
     }
 
     public Bitmap getBmp(final int id) {
+        BitmapBundle bb;
         synchronized (bmp) {
-            return bmp.get(id).bmp;
+            bb = bmp.get(id);
+        }
+        if (bb == null) {
+            return null;
+        } else {
+            return bb.bmp;
         }
     }
 
-    private Integer getBmpId(final int bmpId) {
+    private Integer getIdByBmpId(final int bmpId) {
         synchronized (bmp) {
             for (int i = 0; i < bmp.size(); i++) {
-                if (bmpId == bmp.valueAt(i).id) {
-                    return i;
+                if (bmpId == bmp.valueAt(i).bmpId) {
+                    return bmp.keyAt(i);
                 }
             }
         }
@@ -73,7 +79,7 @@ public class ResManager {
     public void unloadBmpId(final int bmpId) {
         synchronized (bmp) {
             for (int i = 0; i < bmp.size(); i++) {
-                if (bmpId == bmp.valueAt(i).id) {
+                if (bmpId == bmp.valueAt(i).bmpId) {
                     bmp.delete(bmp.keyAt(i));
                     break;
                 }
@@ -82,15 +88,13 @@ public class ResManager {
     }
 
     private int getNewId() {
-        boolean f;
         do {
             if (lastIndex == Integer.MAX_VALUE) {
                 lastIndex = Integer.MIN_VALUE;
             } else {
                 lastIndex++;
             }
-            f = bmp.get(lastIndex, null) != null;
-        } while (f);
+        } while (bmp.get(lastIndex, null) != null);
         return lastIndex;
     }
 
@@ -122,11 +126,11 @@ public class ResManager {
     }
 
     class BitmapBundle {
-        int id;
+        int bmpId;
         Bitmap bmp;
 
-        public BitmapBundle(int id, Bitmap bmp) {
-            this.id = id;
+        public BitmapBundle(int bmpId, Bitmap bmp) {
+            this.bmpId = bmpId;
             this.bmp = bmp;
         }
     }

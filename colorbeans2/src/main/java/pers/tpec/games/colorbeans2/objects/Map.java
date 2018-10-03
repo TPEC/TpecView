@@ -8,9 +8,10 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.view.MotionEvent;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import pers.tpec.games.colorbeans2.GameScenes;
 import pers.tpec.games.colorbeans2.scenes.MainScene;
@@ -106,7 +107,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
                 mgs[movingPath.get(movingIndex)].setValue(MapGrid.VALUE_VOID);
                 movingIndex++;
                 if (movingIndex == movingPath.size() - 1) {
-                    List<Integer> rl = checkRemove();
+                    Set<Integer> rl = checkRemove();
                     if (rl.isEmpty()) {
                         createNewBeans();
                     } else {
@@ -138,8 +139,12 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         mainScene.getScoreBoard().setScore(sp.getInt("savedScore", 0));
         mainScene.getScoreBoard().updateHighestScore();
         mainScene.getNextBeans().loadGame();
-        state = STATE_NULL;
-        controllerClassifier.setEnabled(true);
+        if (mgVoidLeft == 0) {
+            gameOver();
+        } else {
+            state = STATE_NULL;
+            controllerClassifier.setEnabled(true);
+        }
         return true;
     }
 
@@ -179,8 +184,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
             } while (mgs[p].value != MapGrid.VALUE_VOID);
             mgs[p].setStateNew(i);
             mgVoidLeft--;
-            if (mgVoidLeft == 0) {
-                gameOver();
+            if (mgVoidLeft <= 0) {
                 break;
             }
         }
@@ -197,9 +201,13 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
 
     private void finishNewBeans() {
         if (state == STATE_NEW) {
+            if (mgVoidLeft <= 0) {
+                gameOver();
+                return;
+            }
             state = STATE_NULL;
             mainScene.getNextBeans().generateNewRound(3);
-            List<Integer> rl = checkRemove();
+            Set<Integer> rl = checkRemove();
             if (!rl.isEmpty()) {
                 state = STATE_REMOVE;
                 mgVoidLeft += rl.size();
@@ -270,8 +278,8 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         return r;
     }
 
-    private List<Integer> checkRemove() {
-        List<Integer> r = new ArrayList<>();
+    private Set<Integer> checkRemove() {
+        Set<Integer> r = new HashSet<>();
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 5; j++) {
                 int base = mgs[i * 9 + j].value;

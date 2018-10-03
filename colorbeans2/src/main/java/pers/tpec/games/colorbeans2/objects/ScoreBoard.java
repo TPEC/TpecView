@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import java.text.SimpleDateFormat;
@@ -15,6 +14,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import pers.tpec.games.colorbeans2.GameScenes;
 import pers.tpec.games.colorbeans2.scenes.MainScene;
@@ -39,11 +39,16 @@ public class ScoreBoard implements SceneObject {
     private int score;
     private float viewedScore;
 
+    private long gameCount;
+    private double averageScore;
+    private int averageScoreX;
+
     private int viewedScoreIndex;
 
     private Rect progressBar;
     private Paint paintPB;
     private Paint paintLine;
+    private Paint paintLineAverage;
     private List<Integer> highestScoreX = new ArrayList<>();
     private List<Label> lblHighestScore = new ArrayList<>();
 
@@ -72,6 +77,9 @@ public class ScoreBoard implements SceneObject {
         paintLine = new Paint();
         paintLine.setStrokeWidth(5);
         paintLine.setColor(Color.argb(127, 255, 255, 255));
+        paintLineAverage = new Paint();
+        paintLineAverage.setStrokeWidth(5);
+        paintLineAverage.setColor(Color.argb(127, 255, 0, 0));
         clearScore();
     }
 
@@ -89,6 +97,8 @@ public class ScoreBoard implements SceneObject {
                     sp.getString("HighestScoreDate_" + String.valueOf(i), "")
             ));
         }
+        averageScore = sp.getFloat("AverageScore", (float) 0.0);
+        gameCount = sp.getLong("GameCount", 0);
         Collections.sort(highestScore, comparator);
         highestScoreX.clear();
         lblHighestScore.clear();
@@ -125,7 +135,7 @@ public class ScoreBoard implements SceneObject {
                 highestScore.remove(highestScore.size() - 1);
                 highestScore.add(new Score(
                         score,
-                        new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date())
+                        new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA).format(new Date())
                 ));
                 Collections.sort(highestScore, comparator);
                 return true;
@@ -140,6 +150,13 @@ public class ScoreBoard implements SceneObject {
      * @return no. (-1: not on highest score)
      */
     public int getScoreNo() {
+        if (gameCount < 150) {
+            averageScore = averageScore * ((double) gameCount / (double) (gameCount + 1)) + (double) score / (double) (gameCount + 1);
+        } else {
+            averageScore = averageScore * (149.0 / 150.0) + (double) score / 150.0;
+        }
+        gameCount++;
+        saveAverageScore();
         if (checkNewHighestScore()) {
             saveHighestScore();
             for (int i = highestScore.size() - 1; i >= 0; i--) {
@@ -157,6 +174,13 @@ public class ScoreBoard implements SceneObject {
             m.put("HighestScore_" + String.valueOf(i), highestScore.get(i).value);
             m.put("HighestScoreDate_" + String.valueOf(i), highestScore.get(i).date);
         }
+        SharedPreferencesUtil.save(mainScene.getContext(), m);
+    }
+
+    private void saveAverageScore() {
+        java.util.Map<String, Object> m = new HashMap<>();
+        m.put("AverageScore", (float) averageScore);
+        m.put("GameCount", gameCount);
         SharedPreferencesUtil.save(mainScene.getContext(), m);
     }
 
@@ -179,6 +203,7 @@ public class ScoreBoard implements SceneObject {
             canvas.drawLine(x, SCORE_BOARD_TOP + 50, x, SCORE_BOARD_TOP + 120, paintLine);
             canvas.drawLine(x, SCORE_BOARD_TOP + 120, (4 - i) * 144 + 72, SCORE_BOARD_TOP + 150, paintLine);
         }
+        canvas.drawLine(averageScoreX, SCORE_BOARD_TOP + 50, averageScoreX, SCORE_BOARD_TOP + 120, paintLineAverage);
         for (Label label : lblHighestScore) {
             label.drawSelf(canvas);
         }
@@ -226,6 +251,7 @@ public class ScoreBoard implements SceneObject {
                 for (Score s : highestScore) {
                     highestScoreX.add((int) ((float) s.value / (float) highestScore.get(0).value * 720f));
                 }
+                averageScoreX = (int) ((float) averageScore / (float) highestScore.get(0).value * 720f);
             }
         } else {
             progressBar.right = 720;
@@ -236,6 +262,7 @@ public class ScoreBoard implements SceneObject {
             for (Score s : highestScore) {
                 highestScoreX.add((int) ((float) s.value / viewedScore * 720f));
             }
+            averageScoreX = (int) ((float) averageScore / viewedScore * 720f);
         }
     }
 

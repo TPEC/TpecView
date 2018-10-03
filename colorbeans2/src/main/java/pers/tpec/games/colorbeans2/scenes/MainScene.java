@@ -9,6 +9,8 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.view.KeyEvent;
 
+import java.lang.reflect.InvocationTargetException;
+
 import pers.tpec.game.colorbeans2.R;
 import pers.tpec.games.colorbeans2.GameScenes;
 import pers.tpec.games.colorbeans2.objects.Map;
@@ -20,6 +22,9 @@ import pers.tpec.tpecview.TpecView;
 import pers.tpec.tpecview.controller.RectBorder;
 
 public class MainScene extends Scene {
+    public static final int PARAM_NEWGAME = 0;
+    public static final int PARAM_LOADGAME = 1;
+
     private int soMap;
     private int soNextBeans;
     private int soScoreBoard;
@@ -82,7 +87,7 @@ public class MainScene extends Scene {
     @Override
     public void load() {
         bmpBackground = getBmp(loadBmp(R.mipmap.bgl));
-        bmpBeans = loadBmp(R.mipmap.beans);
+        bmpBeans = loadBmp(R.mipmap.beans2);
         bmpBeanBg = loadBmp(R.mipmap.bgg);
 
         soNextBeans = addSceneObject(new NextBeans());
@@ -91,15 +96,18 @@ public class MainScene extends Scene {
         soGameOverScene = addSceneObject(
                 new GameOverScene(tpecView)
                         .setBorder(new RectBorder(80, 240, 560, 800)));
-        if (!getMap().loadGame()) {
+        if (param == PARAM_NEWGAME) {
             getMap().newGame();
+        } else {
+            if (!getMap().loadGame()) {
+                getMap().newGame();
+            }
         }
     }
 
     @Override
     public void unload() {
         clearSceneObject();
-
 //        unloadBmpAll();
     }
 
@@ -116,9 +124,14 @@ public class MainScene extends Scene {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (!getMap().saveGame()) {
-                return true;
+            if (getMap().saveGame()) {
+                try {
+                    switchScene(MenuScene.class);
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                    e.printStackTrace();
+                }
             }
+            return true;
         }
         return false;
     }
