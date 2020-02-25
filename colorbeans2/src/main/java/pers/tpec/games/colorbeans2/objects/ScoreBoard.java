@@ -33,6 +33,7 @@ public class ScoreBoard implements SceneObject {
 
     private Label lblScoreLabel;
     private Label lblScore;
+    private Label lblAverageScore;
 
     private List<Score> highestScore = new ArrayList<>();
 
@@ -70,7 +71,12 @@ public class ScoreBoard implements SceneObject {
                 .setAntiAlias(true)
                 .setFontStyle(null, Label.FONT_STYLE_BOLD)
                 .setFontColor(Color.BLACK);
-
+        lblAverageScore = new Label(new Rect(360, SCORE_BOARD_TOP, 720, SCORE_BOARD_TOP + 50));
+        lblAverageScore.setAlign(8, 0, 8, 0)
+                .setAlignStyle(Label.ALIGN_STYLE_RIGHT, Label.ALIGN_STYLE_MID)
+                .setFontColor(Color.rgb(159, 0, 0))
+                .setFontSize(30)
+                .setAntiAlias(true);
         progressBar = new Rect(0, SCORE_BOARD_TOP + 50, 0, SCORE_BOARD_TOP + 120);
         paintPB = new Paint();
         paintPB.setColor(Color.argb(127, 0, 0, 255));
@@ -83,9 +89,14 @@ public class ScoreBoard implements SceneObject {
         clearScore();
     }
 
-    public void addScoreByRemove(final int count) {
-        int add = count * count - 8 * count + 25;
+    public int addScoreByRemove(final int count, final int combo) {
+        int add = (count * count - 7 * count + 20) * combo;
         this.score += add;
+        return add;
+    }
+
+    public void clearAllSavedData() {
+        SharedPreferencesUtil.clear(mainScene.getContext());
     }
 
     public void updateHighestScore() {
@@ -114,6 +125,7 @@ public class ScoreBoard implements SceneObject {
                             .setFontSize(24)
             );
         }
+        lblAverageScore.setText("平均：" + String.valueOf((int) averageScore).trim());
         viewedScoreChanged();
     }
 
@@ -207,6 +219,7 @@ public class ScoreBoard implements SceneObject {
         for (Label label : lblHighestScore) {
             label.drawSelf(canvas);
         }
+        lblAverageScore.drawSelf(canvas);
         lblScore.drawSelf(canvas);
     }
 

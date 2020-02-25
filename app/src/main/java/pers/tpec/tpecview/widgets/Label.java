@@ -4,8 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.support.annotation.NonNull;
-import android.view.KeyEvent;
+import androidx.annotation.NonNull;
 import android.view.MotionEvent;
 
 import java.util.ArrayList;
@@ -76,8 +75,10 @@ public class Label implements SceneObject {
     }
 
     public Label setText(final String text) {
-        this.text = text;
-        getTextInLines();
+        if (!this.text.equals(text)) {
+            this.text = text;
+            getTextInLines();
+        }
         return this;
     }
 

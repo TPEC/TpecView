@@ -3,7 +3,7 @@ package pers.tpec.games.colorbeans2.scenes;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 

@@ -3,7 +3,7 @@ package pers.tpec.tpecview;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.SparseArray;
 import android.util.TypedValue;
 

@@ -25,6 +25,7 @@ import pers.tpec.tpecview.utils.rand.SimpleRand;
 import pers.tpec.tpecview.widgets.gif.Gif;
 import pers.tpec.tpecview.widgets.gif.SimpleGif;
 import pers.tpec.tpecview.widgets.particles.ParticleFactory;
+import pers.tpec.tpecview.widgets.words.FadedWords;
 
 public class Map implements SceneObject, ControllerClassifier.OnClickListener {
     public static final int MAP_TOP = 280;
@@ -52,6 +53,8 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
 
     private List<Integer> movingPath;
 
+    private int combo;
+
 
     public Map() {
         this.mainScene = GameScenes.getInstance().getMainScene();
@@ -77,7 +80,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
         mainScene.getNextBeans().generateNewRound(5);
         createNewBeans();
         mainScene.getScoreBoard().clearScore();
-
+        combo = 0;
 //        gameOver();
     }
 
@@ -109,14 +112,48 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
                 if (movingIndex == movingPath.size() - 1) {
                     Set<Integer> rl = checkRemove();
                     if (rl.isEmpty()) {
+                        combo = 0;
                         createNewBeans();
                     } else {
+                        combo++;
                         state = STATE_REMOVE;
                         mgVoidLeft += rl.size();
                         for (Integer i : rl) {
                             mgs[i].setStateRemove();
                         }
-                        mainScene.getScoreBoard().addScoreByRemove(rl.size());
+                        int addScore = mainScene.getScoreBoard().addScoreByRemove(rl.size(), combo);
+
+                        int x = mgs[movingPath.get(movingIndex)].rectDst.centerX();
+                        int y = mgs[movingPath.get(movingIndex)].rectDst.centerY();
+                        if (x > 640) {
+                            x = 640;
+                        }
+                        mainScene.addSceneObject2(
+                                new FadedWords(
+                                        x,
+                                        y,
+                                        "+" + String.valueOf(addScore / combo).trim(),
+                                        0, -4f,
+                                        15,
+                                        new int[]{Color.WHITE, Color.argb(0, 255, 255, 255)},
+                                        new float[]{0, 1f},
+                                        50
+                                )
+                        );
+                        if (combo >= 2) {
+                            mainScene.addSceneObject2(
+                                    new FadedWords(
+                                            x,
+                                            y + 60,
+                                            "X" + String.valueOf(combo).trim(),
+                                            0, -4f,
+                                            15,
+                                            new int[]{Color.YELLOW, Color.argb(0, 255, 255, 0)},
+                                            new float[]{0, 1f},
+                                            75
+                                    )
+                            );
+                        }
                     }
                 }
             }
@@ -136,6 +173,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
                 mgVoidLeft++;
             }
         }
+        combo = sp.getInt("combo", 0);
         mainScene.getScoreBoard().setScore(sp.getInt("savedScore", 0));
         mainScene.getScoreBoard().updateHighestScore();
         mainScene.getNextBeans().loadGame();
@@ -157,6 +195,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
             }
             m.put("savedMap", sm.toString());
             m.put("savedScore", mainScene.getScoreBoard().getScore());
+            m.put("combo", combo);
             SharedPreferencesUtil.save(mainScene.getContext(), m);
             mainScene.getNextBeans().saveGame();
             return true;
@@ -443,7 +482,7 @@ public class Map implements SceneObject, ControllerClassifier.OnClickListener {
                     color = Color.argb(255, 0, 159, 159);
                     break;
                 case 7:
-                    color = Color.argb(255, 95, 95, 95);
+                    color = Color.argb(255, 255, 127, 0);
                     break;
                 default:
                     color = 0;

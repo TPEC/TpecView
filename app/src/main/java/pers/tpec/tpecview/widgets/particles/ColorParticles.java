@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import pers.tpec.tpecview.utils.ColorUtil;
 import pers.tpec.tpecview.utils.rand.Rand;
 import pers.tpec.tpecview.utils.rand.SimpleRand;
 
@@ -141,12 +142,12 @@ public class ColorParticles extends Particles {
                     } else {
                         float tp = u.getTimeSpent();
                         if (tp < colorAtTime[u.colorIndex]) {
-                            u.color = ParticleFactory.getColorBetween(color[u.colorIndex - 1], color[u.colorIndex],
+                            u.color = ColorUtil.getColorBetween(color[u.colorIndex - 1], color[u.colorIndex],
                                     (tp - colorAtTime[u.colorIndex - 1]) / (colorAtTime[u.colorIndex] - colorAtTime[u.colorIndex - 1]));
                         } else {
                             u.color = (tp == colorAtTime[u.colorIndex])
                                     ? color[u.colorIndex]
-                                    : ParticleFactory.getColorBetween(color[u.colorIndex], color[u.colorIndex + 1],
+                                    : ColorUtil.getColorBetween(color[u.colorIndex], color[u.colorIndex + 1],
                                     (tp - colorAtTime[u.colorIndex]) / (colorAtTime[u.colorIndex + 1] - colorAtTime[u.colorIndex]));
                             u.colorIndex++;
                         }

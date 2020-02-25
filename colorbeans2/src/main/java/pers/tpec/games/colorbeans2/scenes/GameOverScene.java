@@ -2,9 +2,10 @@ package pers.tpec.games.colorbeans2.scenes;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import pers.tpec.game.colorbeans2.R;
 import pers.tpec.games.colorbeans2.GameScenes;
@@ -65,19 +66,19 @@ public class GameOverScene extends SceneDialog {
         rectSrc = new Rect(0, 0, bmpBg.getWidth(), bmpBg.getHeight());
 
         lblScore = addSceneObject(
-                new Label(new Rect(0, 0, getBorderRect().width(), 120))
+                new Label(new Rect(0, 240, getBorderRect().width(), 360))
                         .setAntiAlias(true)
                         .setFontSize(50)
                         .setAlignStyle(Label.ALIGN_STYLE_MID, Label.ALIGN_STYLE_MID)
         );
         lblNo = addSceneObject(
-                new Label(new Rect(0, 100, getBorderRect().width(), 240))
+                new Label(new Rect(0, 360, getBorderRect().width(), 480))
                         .setAntiAlias(true)
                         .setFontSize(40)
                         .setAlignStyle(Label.ALIGN_STYLE_MID, Label.ALIGN_STYLE_MID)
         );
         btnNewGame = addSceneObject(
-                new Button(new Rect(0, 240, getBorderRect().width(), 360))
+                new Button(new Rect(0, 480, getBorderRect().width(), 720))
                         .setOnClickListener(new ControllerClassifier.OnClickListener() {
                             @Override
                             public boolean click(int x, int y) {
@@ -87,6 +88,15 @@ public class GameOverScene extends SceneDialog {
                             }
                         })
                         .setBmp(ResManager.getInstance().decodeResource(R.mipmap.beans2))
+        );
+
+        addSceneObject(
+                new Label(((Button) getSceneObject(btnNewGame)).getRectDst())
+                        .setAntiAlias(true)
+                        .setFontSize(50)
+                        .setFontColor(Color.WHITE)
+                        .setAlignStyle(Label.ALIGN_STYLE_MID, Label.ALIGN_STYLE_MID)
+                        .setText("再来一局")
         );
     }
 

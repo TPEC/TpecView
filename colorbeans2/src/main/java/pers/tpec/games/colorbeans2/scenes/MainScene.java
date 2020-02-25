@@ -6,10 +6,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.KeyEvent;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import pers.tpec.game.colorbeans2.R;
 import pers.tpec.games.colorbeans2.GameScenes;
@@ -20,15 +24,19 @@ import pers.tpec.tpecview.Scene;
 import pers.tpec.tpecview.SceneObject;
 import pers.tpec.tpecview.TpecView;
 import pers.tpec.tpecview.controller.RectBorder;
+import pers.tpec.tpecview.widgets.Label;
 
 public class MainScene extends Scene {
     public static final int PARAM_NEWGAME = 0;
     public static final int PARAM_LOADGAME = 1;
 
+    private static final DateFormat DATEFORMAT = new SimpleDateFormat("MM-dd  HH:mm:ss", Locale.CHINA);
+
     private int soMap;
     private int soNextBeans;
     private int soScoreBoard;
     private int soGameOverScene;
+    private int soTimeBoard;
 
     private Bitmap bmpBackground;
     private int bmpBeans;
@@ -85,6 +93,12 @@ public class MainScene extends Scene {
     }
 
     @Override
+    public void logic() {
+        ((Label) getSceneObject(soTimeBoard)).setText(DATEFORMAT.format(new Date()));
+        super.logic();
+    }
+
+    @Override
     public void load() {
         bmpBackground = getBmp(loadBmp(R.mipmap.bgl));
         bmpBeans = loadBmp(R.mipmap.beans2);
@@ -96,6 +110,14 @@ public class MainScene extends Scene {
         soGameOverScene = addSceneObject(
                 new GameOverScene(tpecView)
                         .setBorder(new RectBorder(80, 240, 560, 800)));
+        soTimeBoard = addSceneObject(
+                new Label(new Rect(0, 0, 720, 40))
+                        .setAlign(8)
+                        .setAlignStyle(Label.ALIGN_STYLE_LEFT, Label.ALIGN_STYLE_MID)
+                        .setFontColor(Color.WHITE)
+                        .setFontSize(30)
+                        .setBackground(Color.argb(127, 0, 0, 0))
+        );
         if (param == PARAM_NEWGAME) {
             getMap().newGame();
         } else {

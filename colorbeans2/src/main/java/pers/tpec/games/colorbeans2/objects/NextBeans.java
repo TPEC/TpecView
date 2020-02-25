@@ -20,7 +20,7 @@ import pers.tpec.tpecview.utils.rand.Rand;
 import pers.tpec.tpecview.utils.rand.SimpleRand;
 
 public class NextBeans implements SceneObject {
-    public static final int BEAN_TYPE_COUNT = 6;
+    public static final int BEAN_TYPE_COUNT = 7;
 
     private static final int NEXT_BEAN_TOP = 150;
 
